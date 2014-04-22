@@ -210,7 +210,7 @@ set(BIN_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
 
 # Add version info file
 add_custom_target(verinfo
-                  ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/verinfo.py ${CMAKE_BINARY_DIR}/lib/og-maths-${PLATFORM_CODE}-sha1.txt ${JAR_VERSION}
+                  ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/verinfo.py ${CMAKE_BINARY_DIR}/verinfo.yaml ${JAR_VERSION}
                   COMMENT "Generating version info")
 
 add_subdirectory(src)
