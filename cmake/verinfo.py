@@ -5,18 +5,11 @@
 #
 
 import platform, sys, subprocess
-
-verinfo='''\
-project: %(project)s
-version: %(version)s
-revision: %(revision)s
-platforms:
-    - %(platform)s
-artifacts:
-%(artifacts)s
-'''
-
-artifact='    - %s'
+from yaml import load, dump
+try:
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
 
 jars = [ None, 'javadoc', 'sources', 'tests' ]
 
@@ -37,10 +30,10 @@ def platform_code():
         return 'win'
 
 def generate_verinfo(project, version, revision):
-    artifacts = '\n'.join([ artifact % jarname (version, jar) for jar in jars ])
+    artifacts = [ jarname (version, jar) for jar in jars ]
     d = { 'project': 'OG-Maths', 'revision': revision, 'version': version, \
-          'platform': platform_code(), 'artifacts': artifacts }
-    return verinfo % d
+          'platforms': [platform_code()], 'artifacts': artifacts }
+    return d
 
 def main():
     if len(sys.argv) != 3:
@@ -54,7 +47,7 @@ def main():
         raise RuntimeError('Error getting SHA1 of git HEAD')
 
     with open(sys.argv[1],'w') as f:
-        f.write(generate_verinfo('OG-Maths', sys.argv[2], rev.strip()))
+        f.write(dump(generate_verinfo('OG-Maths', sys.argv[2], rev.strip()), Dumper=Dumper))
     return 0
 
 if __name__ == '__main__':
