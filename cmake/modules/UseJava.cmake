@@ -343,9 +343,11 @@ function(add_jar _TARGET_NAME)
 
     set(_JAVA_RESOURCE_FILES)
     foreach(_JAVA_RESOURCE ${_JAVA_RESOURCES})
-      get_filename_component(_JAVA_RESOURCE_FILE ${_JAVA_RESOURCE} NAME_WE)
+      get_filename_component(_JAVA_RESOURCE_FILE ${_JAVA_RESOURCE} NAME)
+      message("Resource file: ${_JAVA_RESOURCE_FILE}")
       set(_src ${_JAVA_RESOURCE})
       set(_dest ${CMAKE_JAVA_CLASS_OUTPUT_PATH}/${_JAVA_RESOURCE_FILE})
+      message("Source: ${_src}, dest: ${_dest}")
       if(IS_DIRECTORY ${_JAVA_RESOURCE})
         add_custom_command(OUTPUT  ${_dest}
                            COMMAND cmake -E copy_directory
@@ -450,7 +452,7 @@ function(add_jar _TARGET_NAME)
                 -D_JAVA_TARGET_OUTPUT_NAME=${_JAVA_JAR_OUTPUT_PATH}
                 -D_JAVA_TARGET_OUTPUT_LINK=${_JAVA_TARGET_OUTPUT_LINK}
                 -P ${_JAVA_SYMLINK_SCRIPT}
-            DEPENDS ${_JAVA_RESOURCE_FILES} ${_JAVA_DEPENDS} ${CMAKE_JAVA_CLASS_OUTPUT_PATH}/java_class_filelist
+            DEPENDS ${_JAVA_DEPENDS} ${CMAKE_JAVA_CLASS_OUTPUT_PATH}/java_class_filelist
             WORKING_DIRECTORY ${CMAKE_JAVA_CLASS_OUTPUT_PATH}
             COMMENT "Creating Java archive ${_JAVA_TARGET_OUTPUT_NAME}"
         )
@@ -467,7 +469,7 @@ function(add_jar _TARGET_NAME)
                     -D_JAVA_TARGET_OUTPUT_LINK=${_JAVA_TARGET_OUTPUT_LINK}
                     -P ${_JAVA_SYMLINK_SCRIPT}
                 WORKING_DIRECTORY ${CMAKE_JAVA_CLASS_OUTPUT_PATH}
-                DEPENDS ${_JAVA_RESOURCE_FILES} ${_JAVA_DEPENDS} ${CMAKE_JAVA_CLASS_OUTPUT_PATH}/java_class_filelist
+                DEPENDS ${_JAVA_DEPENDS} ${CMAKE_JAVA_CLASS_OUTPUT_PATH}/java_class_filelist
                 COMMENT "Creating Java archive ${_JAVA_TARGET_OUTPUT_NAME}"
             )
         else()
@@ -482,7 +484,7 @@ function(add_jar _TARGET_NAME)
                     -D_JAVA_TARGET_OUTPUT_LINK=${_JAVA_TARGET_OUTPUT_LINK}
                     -P ${_JAVA_SYMLINK_SCRIPT}
                 WORKING_DIRECTORY ${CMAKE_JAVA_CLASS_OUTPUT_PATH}
-                DEPENDS ${_JAVA_RESOURCE_FILES} ${_JAVA_DEPENDS} ${CMAKE_JAVA_CLASS_OUTPUT_PATH}/java_class_filelist
+                DEPENDS ${_JAVA_DEPENDS} ${CMAKE_JAVA_CLASS_OUTPUT_PATH}/java_class_filelist
                 COMMENT "Creating Java archive ${_JAVA_TARGET_OUTPUT_NAME}"
             )
             add_custom_target(${_TARGET_NAME} ALL DEPENDS ${_JAVA_JAR_OUTPUT_PATH})

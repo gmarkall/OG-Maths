@@ -212,9 +212,13 @@ set(BIN_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
 if(NOT DEFINED BUILDNUMBER)
   set(BUILDNUMBER local)
 endif()
-add_custom_target(verinfo
+add_custom_target(dummy)
+add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/verinfo.yaml
+                  COMMAND
                   ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/verinfo.py ${CMAKE_BINARY_DIR}/verinfo.yaml ${JAR_VERSION} ${LAPACK_BUILDDIR}/verinfo.yaml ${BUILDNUMBER}
+                  DEPENDS dummy
                   COMMENT "Generating version info")
+add_custom_target(verinfo DEPENDS ${CMAKE_BINARY_DIR}/verinfo.yaml)
 
 add_subdirectory(src)
 

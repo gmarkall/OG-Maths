@@ -69,7 +69,6 @@ endforeach()
 add_jar(${JAR_NAME_NO_EXTN} ${JAR_SOURCES}
         RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/config ${CMAKE_BINARY_DIR}/verinfo.yaml
         INCLUDE_NATIVE TRUE
-        DEPENDS verinfo
         ENTRY_POINT com/opengamma/maths/nativeloader/NativeLibrariesSelfTest
         OUTPUT_DIR ${JARDIR})
 
