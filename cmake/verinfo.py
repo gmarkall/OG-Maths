@@ -34,7 +34,7 @@ def get_subprojects(lapack_verinfo_file):
         lapack_verinfo = load(f, Loader=Loader)
     if len(lapack_verinfo['platforms']) != 1 or lapack_verinfo['platforms'][0] != platform_code():
         raise RuntimeError('OG-Lapack platform mismatch')
-    return [{ 'project': lapack_verinfo['project'], 'revision': lapack_verinfo['revision'] }]
+    return [lapack_verinfo]
 
 def generate_verinfo(project, version, revision, lapack_verinfo_file, buildnumber):
     artifacts = [ jarname (version, jar) for jar in jars ]
