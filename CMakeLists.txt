@@ -210,7 +210,7 @@ set(BIN_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
 
 # Add version info file
 add_custom_target(verinfo
-                  ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/verinfo.py ${CMAKE_BINARY_DIR}/verinfo.yaml ${JAR_VERSION}
+                  ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/verinfo.py ${CMAKE_BINARY_DIR}/verinfo.yaml ${JAR_VERSION} ${LAPACK_BUILDDIR}/verinfo.yaml
                   COMMENT "Generating version info")
 
 add_subdirectory(src)
