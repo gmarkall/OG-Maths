@@ -36,17 +36,21 @@ def get_subprojects(lapack_verinfo_file):
         raise RuntimeError('OG-Lapack platform mismatch')
     return [{ 'project': lapack_verinfo['project'], 'revision': lapack_verinfo['revision'] }]
 
-def generate_verinfo(project, version, revision, lapack_verinfo_file):
+def generate_verinfo(project, version, revision, lapack_verinfo_file, buildnumber):
     artifacts = [ jarname (version, jar) for jar in jars ]
     subprojects = get_subprojects(lapack_verinfo_file)
+    try:
+        buildnumber = int(buildnumber)
+    except ValueError:
+        pass
     d = { 'project': 'OG-Maths', 'revision': revision, 'version': version, \
           'platforms': [platform_code()], 'artifacts': artifacts,
-          'subprojects': subprojects }
+          'subprojects': subprojects, 'buildnumber': buildnumber }
     return d
 
 def main():
-    if len(sys.argv) != 4:
-        print "Usage: verinfo.py <output_file> <version> <lapack_verinfo>"
+    if len(sys.argv) != 5:
+        print "Usage: verinfo.py <output_file> <version> <lapack_verinfo> <build number>"
         return 1
 
     process = subprocess.Popen(['git', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE)
@@ -56,7 +60,7 @@ def main():
         raise RuntimeError('Error getting SHA1 of git HEAD')
 
     with open(sys.argv[1],'w') as f:
-        f.write(dump(generate_verinfo('OG-Maths', sys.argv[2], rev.strip(), sys.argv[3]), Dumper=Dumper))
+        f.write(dump(generate_verinfo('OG-Maths', sys.argv[2], rev.strip(), sys.argv[3], sys.argv[4]), Dumper=Dumper))
     return 0
 
 if __name__ == '__main__':
