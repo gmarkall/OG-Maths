@@ -49,10 +49,10 @@ class TestVerinfo(unittest.TestCase):
         self.assertRaises(ValueError, validate_version_info, make_bad_subproject('revision'))
 
     def test_combine_version_info(self):
-        combined = construct_combined_verinfo(VERINFO_REFERENCES)
+        combined = construct_combined_verinfo(VERINFO_REFERENCES, 1)
         # Again, a fiddly dict compare:
-        self.assertEqual(6, len(combined.keys()))
-        for k in ('project', 'revision', 'version', 'artifacts'):
+        self.assertEqual(7, len(combined.keys()))
+        for k in ('project', 'revision', 'version', 'artifacts', 'buildnumber'):
             self.assertEquals(VERINFO_COMBINED_REFERENCE[k], combined[k])
         # Subproject check
         self.assertEquals(1, len(combined['subprojects'].keys()))
@@ -118,6 +118,7 @@ VERINFO_COMBINED_REFERENCE = \
                'og-maths-0.1.0-SNAPSHOT-javadoc.jar',
                'og-maths-0.1.0-SNAPSHOT-sources.jar',
                'og-maths-0.1.0-SNAPSHOT-tests.jar'],
+ 'buildnumber': 1,
  'buildnumbers': {'lnx': 25,
                   'osx': 6,
                   'subprojects': {'OG-Lapack': {'lnx': 9,

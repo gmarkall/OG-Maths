@@ -24,8 +24,8 @@ def main():
 
     verinfos = read_version_info(sourceblobs)
     validate_version_info(verinfos)
-    newverinfo = construct_combined_verinfo(verinfos)
-    newblob = initialise_combined_blob(buildnumber, newverinfo, verinfos)
+    newverinfo = construct_combined_verinfo(verinfos, buildnumber)
+    newblob = initialise_combined_blob(newverinfo, verinfos)
     finalise_combined_blob(newblob)
     return 0
 
@@ -76,7 +76,7 @@ def validate_version_info(verinfos):
                             raise ValueError('Reference blob %s key %s.%s = %s does not match blob %s which has value %s' %
                                              (refblob, k, ks, v, blob, subproject[ks]))
     
-def construct_combined_verinfo(verinfos):
+def construct_combined_verinfo(verinfos, buildnumber):
     """Constructs verinfo for the combined blob based on all constituent verinfos.
     It is expected that the verinfos are already validated."""
 
@@ -108,6 +108,9 @@ def construct_combined_verinfo(verinfos):
         for subproject in verinfo['subprojects']:
             newverinfo['buildnumbers']['subprojects'][subproject['project']][platform] = subproject['buildnumber']
     
+    # Add the build number of the combined blob
+    newverinfo['buildnumber'] = int(buildnumber)
+
     # Add the artifact names.
     basename = '%s-%s' % (newverinfo['project'].lower(), newverinfo['version'])
     artifacts = [ s % basename for s in ('%s.jar', '%s-javadoc.jar', '%s-sources.jar', '%s-tests.jar') ]
@@ -119,10 +122,10 @@ def construct_combined_verinfo(verinfos):
 
     return newverinfo
 
-def initialise_combined_blob(buildnumber, newverinfo, verinfos):
+def initialise_combined_blob(newverinfo, verinfos):
     """Creates a new blob and puts everything in it apart from the main Jar, which
     will require a little more work."""
-    blobname = '%s-%s-%s.zip' % (newverinfo['project'], newverinfo['version'], buildnumber)
+    blobname = '%s-%s-%s.zip' % (newverinfo['project'], newverinfo['version'], newverinfo['buildnumber'])
     blob = zipfile.ZipFile(blobname, 'w')
     blob.writestr('verinfo.yaml', dump(newverinfo, Dumper=Dumper))
     # Need to add list of artifacts to the verinfo, and add the "static" artifacts to the zip file.
