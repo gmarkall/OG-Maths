@@ -48,6 +48,24 @@ class TestVerinfo(unittest.TestCase):
         self.assertRaises(ValueError, validate_version_info, make_bad_subproject('project'))
         self.assertRaises(ValueError, validate_version_info, make_bad_subproject('revision'))
 
+    def test_combine_version_info(self):
+        combined = construct_combined_verinfo(VERINFO_REFERENCES)
+        # Again, a fiddly dict compare:
+        self.assertEqual(5, len(combined.keys()))
+        for k in ('project', 'revision', 'version'):
+            self.assertEquals(VERINFO_COMBINED_REFERENCE[k], combined[k])
+        # Subproject check
+        self.assertEquals(1, len(combined['subprojects'].keys()))
+        self.assertEquals(VERINFO_COMBINED_REFERENCE['subprojects']['OG-Lapack'],
+                          combined['subprojects']['OG-Lapack'])
+        # Build number check
+        self.assertEquals(4, len(combined['buildnumbers'].keys()))
+        for k in ('lnx', 'osx', 'win'):
+            self.assertEquals(VERINFO_COMBINED_REFERENCE['buildnumbers'][k],
+                              combined['buildnumbers'][k])
+            self.assertEquals(VERINFO_COMBINED_REFERENCE['buildnumbers']['subprojects']['OG-Lapack'][k],
+                              combined['buildnumbers']['subprojects']['OG-Lapack'][k])
+
 VERINFO_LNX_REFERENCE = \
 {'artifacts': ['jars/og-maths-lnx-0.1.0-SNAPSHOT.jar',
                'jars/og-maths-lnx-0.1.0-SNAPSHOT-javadoc.jar',
@@ -94,6 +112,18 @@ VERINFO_WIN_REFERENCE = \
  'version': '0.1.0-SNAPSHOT'}
 
 VERINFO_REFERENCES = { 'lnx': VERINFO_LNX_REFERENCE, 'osx': VERINFO_OSX_REFERENCE, 'win': VERINFO_WIN_REFERENCE }
+
+VERINFO_COMBINED_REFERENCE = \
+{'buildnumbers': {'lnx': 25,
+                  'osx': 6,
+                  'subprojects': {'OG-Lapack': {'lnx': 9,
+                                                'osx': 9,
+                                                'win': 10}},
+                  'win': 7},
+ 'project': 'OG-Maths',
+ 'revision': 'a57fd89cfcb8b2c6711f6ec8bac19bb339cc24bc',
+ 'subprojects': {'OG-Lapack': '78bb7b167aea5f8b52015610d3ad69f360a84493'},
+ 'version': '0.1.0-SNAPSHOT'}
 
 if __name__ == '__main__':
     unittest.main()
