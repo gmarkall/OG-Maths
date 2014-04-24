@@ -108,6 +108,11 @@ def construct_combined_verinfo(verinfos):
         for subproject in verinfo['subprojects']:
             newverinfo['buildnumbers']['subprojects'][subproject['project']][platform] = subproject['buildnumber']
     
+    # Add the artifact names.
+    basename = '%s-%s' % (newverinfo['project'].lower(), newverinfo['version'])
+    artifacts = [ s % basename for s in ('%s.jar', '%s-javadoc.jar', '%s-sources.jar', '%s-tests.jar') ]
+    newverinfo['artifacts'] = artifacts
+
     if DEBUG:
         print "\nNew verinfo:\n"
         pprint(newverinfo)

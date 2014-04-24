@@ -51,8 +51,8 @@ class TestVerinfo(unittest.TestCase):
     def test_combine_version_info(self):
         combined = construct_combined_verinfo(VERINFO_REFERENCES)
         # Again, a fiddly dict compare:
-        self.assertEqual(5, len(combined.keys()))
-        for k in ('project', 'revision', 'version'):
+        self.assertEqual(6, len(combined.keys()))
+        for k in ('project', 'revision', 'version', 'artifacts'):
             self.assertEquals(VERINFO_COMBINED_REFERENCE[k], combined[k])
         # Subproject check
         self.assertEquals(1, len(combined['subprojects'].keys()))
@@ -114,7 +114,11 @@ VERINFO_WIN_REFERENCE = \
 VERINFO_REFERENCES = { 'lnx': VERINFO_LNX_REFERENCE, 'osx': VERINFO_OSX_REFERENCE, 'win': VERINFO_WIN_REFERENCE }
 
 VERINFO_COMBINED_REFERENCE = \
-{'buildnumbers': {'lnx': 25,
+{'artifacts': ['og-maths-0.1.0-SNAPSHOT.jar',
+               'og-maths-0.1.0-SNAPSHOT-javadoc.jar',
+               'og-maths-0.1.0-SNAPSHOT-sources.jar',
+               'og-maths-0.1.0-SNAPSHOT-tests.jar'],
+ 'buildnumbers': {'lnx': 25,
                   'osx': 6,
                   'subprojects': {'OG-Lapack': {'lnx': 9,
                                                 'osx': 9,
