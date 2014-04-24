@@ -12,7 +12,7 @@ try:
 except ImportError:
     from yaml import Loader, Dumper
 
-DEBUG = True
+DEBUG = False
 
 def main():
     if len(sys.argv) < 4:
@@ -50,14 +50,22 @@ def validate_version_info(verinfos):
         return attr in ['project', 'revision', 'version']
     
     # Use the first blob's verinfo as a reference
-    ref = verinfos[verinfos.keys()[0]]
+    refblob = verinfos.keys()[0]
+    ref = verinfos[refblob]
     for blob, verinfo in verinfos.iteritems():
         for k, v in ref.iteritems():
             if important(k) and v != verinfo[k]:
-                raise RuntimeError('Reference blob %s key %s = %s does not match blob %s which has value %s' %
-                                   (sourceblobs[0], k, v, blob, verinfo[k]))
+                raise ValueError('Reference blob %s key %s = %s does not match blob %s which has value %s' %
+                                 (refblob, k, v, blob, verinfo[k]))
             if k == 'subprojects':
-                # Check subprojects
+                # Check subprojects.
+                # Check the subprojects are the same subprojects in each project
+                refsps = set([ s['project'] for s in ref['subprojects'] ])
+                versps = set([ s['project'] for s in verinfo['subprojects'] ])
+                if refsps != versps:
+                    raise ValueError('Reference blob %s has subprojects %s but blob %s has subprojects %s' %
+                                     (refblob, refsps, blob, versps))
+                # Check subproject keys match
                 for refsubproject in ref['subprojects']:
                     # Find subproject from verinfo
                     for sp in verinfo['subprojects']:
@@ -65,8 +73,8 @@ def validate_version_info(verinfos):
                             subproject = sp
                     for ks, vs in refsubproject.iteritems():
                         if important(ks) and vs != subproject[ks]:
-                            raise RuntimeError('Reference blob %s key %s.%s = %s does not match blob %s which has value %s' %
-                                               (sourceblobs[0], k, ks, v, blob, verinfo['subprojects'][k]))
+                            raise ValueError('Reference blob %s key %s.%s = %s does not match blob %s which has value %s' %
+                                             (refblob, k, ks, v, blob, subproject[ks]))
     
 def construct_combined_verinfo(verinfos):
     """Constructs verinfo for the combined blob based on all constituent verinfos.
