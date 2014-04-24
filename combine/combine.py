@@ -15,18 +15,18 @@ except ImportError:
 DEBUG = False
 
 def main():
-    if len(sys.argv) < 4:
-        print "Usage: combine.py <combined blob output> <build number> [source blobs]"
+    if len(sys.argv) < 3:
+        print "Usage: combine.py <build number> [source blobs]"
         exit(1)
     
-    newblobname = sys.argv[1]
-    buildnum = sys.argv[2]
-    sourceblobs = sys.argv[3:]
+    buildnumber = sys.argv[1]
+    sourceblobs = sys.argv[2:]
 
     verinfos = read_version_info(sourceblobs)
     validate_version_info(verinfos)
     newverinfo = construct_combined_verinfo(verinfos)
-
+    newblob = initialise_combined_blob(buildnumber, newverinfo, verinfos)
+    finalise_combined_blob(newblob)
     return 0
 
 def read_version_info(sourceblobs):
@@ -118,6 +118,35 @@ def construct_combined_verinfo(verinfos):
         pprint(newverinfo)
 
     return newverinfo
-    
+
+def initialise_combined_blob(buildnumber, newverinfo, verinfos):
+    """Creates a new blob and puts everything in it apart from the main Jar, which
+    will require a little more work."""
+    blobname = '%s-%s-%s.zip' % (newverinfo['project'], newverinfo['version'], buildnumber)
+    blob = zipfile.ZipFile(blobname, 'w')
+    blob.writestr('verinfo.yaml', dump(newverinfo, Dumper=Dumper))
+    # Need to add list of artifacts to the verinfo, and add the "static" artifacts to the zip file.
+    # Open up the Linux blob to read the static artifacts from it
+    k = [s for s in verinfos.keys() if 'lnx' in s][0]
+    srcblob = zipfile.ZipFile(k, 'r')
+    srcartifacts = verinfos[k]['artifacts']
+    destartifacts = newverinfo['artifacts']
+    for artifact in srcartifacts:
+        data = srcblob.read(artifact)
+        if 'javadoc' in artifact:
+            destname = [s for s in destartifacts if 'javadoc' in s][0]
+        elif 'sources' in artifact:
+            destname = [s for s in destartifacts if 'sources' in s][0]
+        elif 'tests' in artifact:
+            destname = [s for s in destartifacts if 'tests' in s][0]
+        else:
+            # Don't write this one because it's the main jar
+            continue
+        blob.writestr(destname, data)
+    return blob
+
+def finalise_combined_blob(blob):
+    blob.close()
+
 if __name__ == '__main__':
     sys.exit(main())
