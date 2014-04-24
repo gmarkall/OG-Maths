@@ -23,7 +23,14 @@ def main():
     buildnum = sys.argv[2]
     sourceblobs = sys.argv[3:]
 
-    # Read version info from each source blob:
+    verinfos = read_version_info(sourceblobs)
+    validate_version_info(verinfos)
+    newverinfo = construct_combined_verinfo(verinfos)
+
+    return 0
+
+def read_version_info(sourceblobs):
+    """Read the version info from each of the specified source blobs."""
     verinfos = {}
     for blob in sourceblobs:
         with zipfile.ZipFile(blob, 'r') as zipf:
@@ -32,14 +39,18 @@ def main():
                 if DEBUG:
                     print "\nRead verinfo.yaml from %s:\n" % blob
                     pprint(verinfos[blob])
-                    
+    return verinfos
 
-    # Validate version info - everything should match apart from the platform and build number
+def validate_version_info(verinfos):
+    """Validate version info - the project, revision, and version should match across
+    blobs and across each subproject in the blobs."""
+
     def important(attr):
+        """Returns true if it is important for an attribute to be equal across blobs."""
         return attr in ['project', 'revision', 'version']
     
-    # Use the first one we find as a reference (arbitrarily)
-    ref = verinfos[sourceblobs[0]]
+    # Use the first blob's verinfo as a reference
+    ref = verinfos[verinfos.keys()[0]]
     for blob, verinfo in verinfos.iteritems():
         for k, v in ref.iteritems():
             if important(k) and v != verinfo[k]:
@@ -57,7 +68,12 @@ def main():
                             raise RuntimeError('Reference blob %s key %s.%s = %s does not match blob %s which has value %s' %
                                                (sourceblobs[0], k, ks, v, blob, verinfo['subprojects'][k]))
     
-    # Construct new verinfo
+def construct_combined_verinfo(verinfos):
+    """Constructs verinfo for the combined blob based on all constituent verinfos.
+    It is expected that the verinfos are already validated."""
+
+    # Use the first verinfo as reference
+    ref = verinfos[verinfos.keys()[0]]
 
     # Top-level artifact info
     newverinfo = {}
@@ -88,7 +104,7 @@ def main():
         print "\nNew verinfo:\n"
         pprint(newverinfo)
 
-    return 0
+    return newverinfo
     
 if __name__ == '__main__':
     sys.exit(main())
