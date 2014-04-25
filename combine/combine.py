@@ -30,6 +30,7 @@ def main():
     newverinfo = construct_combined_verinfo(verinfos, buildnumber)
     mainjar = create_main_jar(newverinfo, verinfos)
     create_combined_blob(newverinfo, verinfos, mainjar)
+    write_verinfo(newverinfo)
     return 0
 
 def read_version_info(sourceblobs):
@@ -247,6 +248,13 @@ def create_main_jar(newverinfo, verinfos):
     jarstr = jardata.getvalue()
     jardata.free()
     return jarstr
+
+def write_verinfo(verinfo):
+    """Writes the verinfo.yaml file to the current dir."""
+    if DEBUG:
+        print "Writing verinfo.yaml to current dir"""
+    with open('verinfo.yaml', 'w') as f:
+        f.write(dump(verinfo, Dumper=Dumper))
 
 # Need to add the main jar to the blob in a fn or do the jar making before the blob making.
 
