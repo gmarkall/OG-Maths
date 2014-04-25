@@ -4,10 +4,12 @@
 # Please see distribution for license.
 #
 
+# TODO: Zip compression of jar
+
 import random, string, sys, os, zipfile
 from pprint import pprint
 from yaml import load, dump
-from cStringIO import StringIO
+from StringIO import StringIO
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
@@ -26,9 +28,8 @@ def main():
     verinfos = read_version_info(sourceblobs)
     validate_version_info(verinfos)
     newverinfo = construct_combined_verinfo(verinfos, buildnumber)
-    newblob = initialise_combined_blob(newverinfo, verinfos)
     mainjar = create_main_jar(newverinfo, verinfos)
-    finalise_combined_blob(newblob)
+    create_combined_blob(newverinfo, verinfos, mainjar)
     return 0
 
 def read_version_info(sourceblobs):
@@ -126,13 +127,11 @@ def construct_combined_verinfo(verinfos, buildnumber):
 
     return newverinfo
 
-def initialise_combined_blob(newverinfo, verinfos):
+def create_combined_blob(newverinfo, verinfos, mainjar):
     """Creates a new blob and puts everything in it apart from the main Jar, which
     will require a little more work."""
     blobname = '%s-%s-%s.zip' % (newverinfo['project'], newverinfo['version'], newverinfo['buildnumber'])
     blob = zipfile.ZipFile(blobname, 'w')
-    blob.writestr('verinfo.yaml', dump(newverinfo, Dumper=Dumper))
-    # Need to add list of artifacts to the verinfo, and add the "static" artifacts to the zip file.
     # Open up the Linux blob to read the static artifacts from it
     k = [s for s in verinfos.keys() if 'lnx' in s][0]
     srcblob = zipfile.ZipFile(k, 'r')
@@ -149,19 +148,49 @@ def initialise_combined_blob(newverinfo, verinfos):
         else:
             # Don't write this one because it's the main jar
             continue
+        if DEBUG:
+            print "Adding %s to blob" % destname
         blob.writestr(destname, data)
-    return blob
+    # Add the main jar to the blob
+    mainjarname = [s for s in destartifacts if not ('javadoc' in s or 'sources' in s or 'tests' in s)][0]
+    if DEBUG:
+        print "Adding %s to blob" % mainjarname
+    blob.writestr(mainjarname, mainjar)
+    # Add verinfo to the blob
+    if DEBUG:
+        print "Adding verinfo.yaml to blob"
+    blob.writestr('verinfo.yaml', dump(newverinfo, Dumper=Dumper))
+    blob.close()
 
 def finalise_combined_blob(blob):
     blob.close()
 
 def create_main_jar(newverinfo, verinfos):
-    def random_digits(n):
-       return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(n))
-    jarname = '%s-%s-%s.jar' % (newverinfo['project'].lower(), newverinfo['version'], random_digits(10))
-    if DEBUG:
-        print 'Jar name is %s' % jarname
-    jar = zipfile.ZipFile(jarname, 'w')
+    """Combines the three platform jars to create a single main jar"""
+    class MagicStringIO(StringIO):
+        """A StringIO object whose buffer persists after having close()
+        called - this is required so the ZipFile wrapping it can write
+        out the central directory. In doing so the ZipFile calls close()
+        on the StringIO object it is holding, freeing the data before we
+        get a chance to get at it.
+
+        After the ZipFile has been closed, call free() to actually free
+        the memory buffer (as you normally would to close a file-like
+        object)."""
+
+        def close(self):
+            """Does not free the memory buffer (c.f. StringIO.close()
+            which does."""
+            pass
+
+        def free(self):
+            """Frees the memory buffer."""
+            if not self.closed:
+                self.closed = True
+                del self.buf, self.pos
+
+    jardata = MagicStringIO()
+    jar = zipfile.ZipFile(jardata, 'w')
     # Open the linux blob to get everything out except verinfo, then put it in the new jar
     k = [s for s in verinfos.keys() if 'lnx' in s][0]
     srcblob = zipfile.ZipFile(k, 'r')
@@ -215,7 +244,9 @@ def create_main_jar(newverinfo, verinfos):
     # close the new jar
     jar.close()
     # add the newly-written jar to the blob
-    
+    jarstr = jardata.getvalue()
+    jardata.free()
+    return jarstr
 
 # Need to add the main jar to the blob in a fn or do the jar making before the blob making.
 
