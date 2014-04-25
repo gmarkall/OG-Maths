@@ -7,12 +7,13 @@
 import random, string, sys, os, zipfile
 from pprint import pprint
 from yaml import load, dump
+from cStringIO import StringIO
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
     from yaml import Loader, Dumper
 
-DEBUG = False
+DEBUG = True
 
 def main():
     if len(sys.argv) < 3:
@@ -26,7 +27,7 @@ def main():
     validate_version_info(verinfos)
     newverinfo = construct_combined_verinfo(verinfos, buildnumber)
     newblob = initialise_combined_blob(newverinfo, verinfos)
-    mainjar = create_main_jar(verinfos)
+    mainjar = create_main_jar(newverinfo, verinfos)
     finalise_combined_blob(newblob)
     return 0
 
@@ -155,19 +156,33 @@ def finalise_combined_blob(blob):
     blob.close()
 
 def create_main_jar(newverinfo, verinfos):
-    return "jar"
-    #def random_digits(n):
-        #return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(n))
-    #jarname = '%s-%s-%s.jar' % (newverinfo['project'].lower(), newverinfo['version'], random_digits(10))
-    #jar = zipfile.ZipFile(jarname, 'w')
+    def random_digits(n):
+       return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(n))
+    jarname = '%s-%s-%s.jar' % (newverinfo['project'].lower(), newverinfo['version'], random_digits(10))
+    if DEBUG:
+        print 'Jar name is %s' % jarname
+    jar = zipfile.ZipFile(jarname, 'w')
     # Open the linux blob to get everything out except verinfo, then put it in the new jar
-    #k = [s for s in verinfos.keys() if 'lnx' in s][0]
-    #srcblob = zipfile.ZipFile(k, 'r')
-    #srcblob.open(verinfos.
+    k = [s for s in verinfos.keys() if 'lnx' in s][0]
+    srcblob = zipfile.ZipFile(k, 'r')
+    artifacts = verinfos[k]['artifacts']
+    mainjarname = [s for s in artifacts if not ('javadoc' in s or 'sources' in s or 'tests' in s)][0]
+    zfile = StringIO(srcblob.read(mainjarname))
+    srcblob.close()
+    mainjar = zipfile.ZipFile(zfile, 'r')
+    nl = mainjar.namelist()
+    files = [ n for n in nl if (n[:3] == 'com' or n[:3] == 'lib' or n[:6] == 'config' or n[:8] == 'META-INF') and n[-1] != '/' ]
+    for f in files:
+        if DEBUG:
+            print "Adding %s to main jar" % f
+        data = mainjar.read(f)
+        jar.writestr(f, data)
     # open the mac and windows blobs to get their native libs out
     # add verinfo to the new jar
     # close the new jar
+    jar.close()
     # add the newly-written jar to the blob
+    
 
 # Need to add the main jar to the blob in a fn or do the jar making before the blob making.
 
