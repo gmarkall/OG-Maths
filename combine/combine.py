@@ -4,7 +4,7 @@
 # Please see distribution for license.
 #
 
-import sys, os, zipfile
+import random, string, sys, os, zipfile
 from pprint import pprint
 from yaml import load, dump
 try:
@@ -26,6 +26,7 @@ def main():
     validate_version_info(verinfos)
     newverinfo = construct_combined_verinfo(verinfos, buildnumber)
     newblob = initialise_combined_blob(newverinfo, verinfos)
+    mainjar = create_main_jar(verinfos)
     finalise_combined_blob(newblob)
     return 0
 
@@ -150,6 +151,22 @@ def initialise_combined_blob(newverinfo, verinfos):
 
 def finalise_combined_blob(blob):
     blob.close()
+
+def create_main_jar(newverinfo, verinfos):
+    def random_digits(n):
+        return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(n))
+    jarname = '%s-%s-%s.jar' % (newverinfo['project'].lower(), newverinfo['version'], random_digits(10))
+    jar = zipfile.ZipFile(jarname, 'w')
+    # Open the linux blob to get everything out except verinfo, then put it in the new jar
+    k = [s for s in verinfos.keys() if 'lnx' in s][0]
+    srcblob = zipfile.ZipFile(k, 'r')
+    srcblob.open(verinfos.
+    # open the mac and windows blobs to get their native libs out
+    # add verinfo to the new jar
+    # close the new jar
+    # add the newly-written jar to the blob
+
+# Need to add the main jar to the blob in a fn or do the jar making before the blob making.
 
 if __name__ == '__main__':
     sys.exit(main())
