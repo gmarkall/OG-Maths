@@ -34,12 +34,14 @@ def read_version_info(sourceblobs):
     """Read the version info from each of the specified source blobs."""
     verinfos = {}
     for blob in sourceblobs:
-        with zipfile.ZipFile(blob, 'r') as zipf:
-            with zipf.open('verinfo.yaml') as verinfo:
-                verinfos[blob] = load(verinfo, Loader=Loader)
-                if DEBUG:
-                    print "\nRead verinfo.yaml from %s:\n" % blob
-                    pprint(verinfos[blob])
+        zipf = zipfile.ZipFile(blob, 'r')
+        verinfo = zipf.open('verinfo.yaml')
+        verinfos[blob] = load(verinfo, Loader=Loader)
+        if DEBUG:
+            print "\nRead verinfo.yaml from %s:\n" % blob
+            pprint(verinfos[blob])
+        verinfo.close()
+        zipf.close()
     return verinfos
 
 def validate_version_info(verinfos):
@@ -153,14 +155,15 @@ def finalise_combined_blob(blob):
     blob.close()
 
 def create_main_jar(newverinfo, verinfos):
-    def random_digits(n):
-        return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(n))
-    jarname = '%s-%s-%s.jar' % (newverinfo['project'].lower(), newverinfo['version'], random_digits(10))
-    jar = zipfile.ZipFile(jarname, 'w')
+    return "jar"
+    #def random_digits(n):
+        #return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(n))
+    #jarname = '%s-%s-%s.jar' % (newverinfo['project'].lower(), newverinfo['version'], random_digits(10))
+    #jar = zipfile.ZipFile(jarname, 'w')
     # Open the linux blob to get everything out except verinfo, then put it in the new jar
-    k = [s for s in verinfos.keys() if 'lnx' in s][0]
-    srcblob = zipfile.ZipFile(k, 'r')
-    srcblob.open(verinfos.
+    #k = [s for s in verinfos.keys() if 'lnx' in s][0]
+    #srcblob = zipfile.ZipFile(k, 'r')
+    #srcblob.open(verinfos.
     # open the mac and windows blobs to get their native libs out
     # add verinfo to the new jar
     # close the new jar
