@@ -178,7 +178,40 @@ def create_main_jar(newverinfo, verinfos):
         data = mainjar.read(f)
         jar.writestr(f, data)
     # open the mac and windows blobs to get their native libs out
+    k = [s for s in verinfos.keys() if 'osx' in s][0]
+    osxblob = zipfile.ZipFile(k, 'r')
+    artifacts = verinfos[k]['artifacts']
+    osxjarname = [s for s in artifacts if not ('javadoc' in s or 'sources' in s or 'tests' in s)][0]
+    zfile = StringIO(osxblob.read(osxjarname))
+    osxblob.close()
+    osxjar = zipfile.ZipFile(zfile, 'r')
+    nl = osxjar.namelist()
+    files = [ n for n in nl if n[:3] == 'lib' and n[-1] != '/' ]
+    for f in files:
+        if DEBUG:
+            print "Adding %s to main jar" % f
+        data = osxjar.read(f)
+        jar.writestr(f, data)
+    
+    k = [s for s in verinfos.keys() if 'win' in s][0]
+    winblob = zipfile.ZipFile(k, 'r')
+    artifacts = verinfos[k]['artifacts']
+    winjarname = [s for s in artifacts if not ('javadoc' in s or 'sources' in s or 'tests' in s)][0]
+    zfile = StringIO(winblob.read(winjarname))
+    winblob.close()
+    winjar = zipfile.ZipFile(zfile, 'r')
+    nl = winjar.namelist()
+    files = [ n for n in nl if n[:3] == 'lib' and n[-1] != '/' ]
+    for f in files:
+        if DEBUG:
+            print "Adding %s to main jar" % f
+        data = winjar.read(f)
+        jar.writestr(f, data)
+ 
     # add verinfo to the new jar
+    if DEBUG:
+        print "Adding verinfo.yaml to main jar"
+    jar.writestr('verinfo.yaml', dump(newverinfo, Dumper=Dumper))
     # close the new jar
     jar.close()
     # add the newly-written jar to the blob
