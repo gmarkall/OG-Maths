@@ -7,6 +7,7 @@
 #ifndef _LAPACK_HH
 #define _LAPACK_HH
 
+#include <iostream>
 #include "lapack_raw.h"
 #include "numerictypes.hh"
 
@@ -45,6 +46,7 @@ template<typename T> void xpotrs(char * UPLO, int * N, int * NRHS, T * A, int * 
 template<typename T> real16 xlansy(char * NORM, char * UPLO, int * N, T * A, int * LDA, real16 * WORK);
 template<typename T> void xpotrf(char * UPLO, int * N, T * A, int * LDA, int * INFO);
 template<typename T> void xtrtrs(char * UPLO, char * TRANS, char * DIAG, int * N, int * NRHS, T * A, int * LDA, T * B, int * LDB, int * INFO);
+template<typename T> void xgetrf(int * M, int * N, T * A, int * LDA, int * IPIV, int *INFO);
 
 }
 
@@ -180,6 +182,17 @@ template<typename T> real16 xnrm2(int * N, T * X, int * INCX);
  * @throws rdag_error on illegal input OR non-convergence
  */
 template<typename T> void xgesvd(char * JOBU, char * JOBVT, int * M, int * N, T * A, int * LDA, real16 * S, T * U, int * LDU, T * VT, int * LDVT, int * INFO);
+
+/**
+ * xgetrf() computes the LU decomposition using parital pivoting
+ * @param M as LAPACK dgetrf M
+ * @param N as LAPACK dgetrf N
+ * @param A data type specific with intent as LAPACK dgetrf A
+ * @param LDA as LAPACK dgetrf LDA
+ * @param IPIV as LAPACK dgetrf IPIV
+ * @param INFO as LAPACK dgetrf INFO
+ */
+template<typename T> void xgetrf(int * M, int * N, T * A, int * LDA, int * IPIV, int *INFO);
 
 /**
  * xtrcon general triangular matrix condition number estimate

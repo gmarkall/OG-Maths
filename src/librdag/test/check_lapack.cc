@@ -35,6 +35,10 @@ complex16 cutri4[16] = {{1,10}, 0,0,0,{2,20}, {6,60}, 0,0,{3,30}, {7,70}, {11,11
 real16 rspd[16] =  {5,9,10,8,9,17,19,15,10,19,29,21,8,15,21,28};
 complex16 cspd[16] = {{ 50,   0}, { 90,  -9}, {100, -10}, { 80,  -8}, { 90,   9}, {170,   0}, {190, -19}, {150, -15}, {100,  10}, {190,  19}, {290,   0}, {210, -21}, { 80,   8}, {150,  15}, {210,  21}, {280,   0}};
 
+// ok cond 5x4
+real16 rcondok5x4[20] =  {5,9,10,8,1,9,17,19,15,2,10,19,29,21,3,8,15,21,28,4};
+complex16 ccondok5x4[20] = {{5.,-10.}, {9.,-18.}, {10.,-20.}, {8.,-16.}, {1.,-2.}, {9.,-18.}, {17.,-34.}, {19.,-38.}, {15.,-30.}, {2.,-4.}, {10.,-20.}, {19.,-38.}, {29.,-58.}, {21.,-42.}, {3.,-6.}, {8.,-16.}, {15.,-30.}, {21.,-42.}, {28.,-56.}, {4.,-8.}};
+
 
 // Check successful templating of dscal.
 TEST(LAPACKTest_xscal, dscal) {
@@ -285,6 +289,57 @@ TEST(LAPACKTest_xgesvd, zgesvd) {
   delete[] expectedVT;
   delete[] A;
   delete[] Acpy;
+}
+
+
+// Check successful templating of dgetrf.
+TEST(LAPACKTest_xgetrf, dgetrf) {
+  int m = 5;
+  int n = 4;
+  const int minmn = m > n ? n : m;
+  int INFO = 0;
+
+  real16 * expectedA = new real16[20]{10.,0.5,0.9,0.8,0.1,19.,-0.5,0.2000000000000028,0.4000000000000021,-0.1999999999999997,29.,-4.5,-6.1999999999999886,0.0645161290322571,0.1290322580645162,21.,-2.5,-3.3999999999999950,12.4193548387096779,0.1480519480519481};
+
+  int * expectedIPIV = new int[4]{3,3,3,4};
+
+  real16 * Acpy = new real16[20];
+  std::copy(rcondok5x4,rcondok5x4+m*n,Acpy);
+  int * ipiv = new int[minmn]();
+  lapack::xgetrf(&m,&n,Acpy,&m,ipiv,&INFO);
+
+  EXPECT_TRUE(ArrayBitEquals(expectedIPIV,ipiv,4));
+  EXPECT_TRUE(ArrayFuzzyEquals(expectedA,Acpy,20));
+
+  delete [] ipiv;
+  delete [] expectedIPIV;
+  delete [] Acpy;
+  delete [] expectedA;
+}
+
+// Check successful templating of zgetrf.
+TEST(LAPACKTest_xgetrf, zgetrf) {
+  int m = 5;
+  int n = 4;
+  const int minmn = m > n ? n : m;
+  int INFO = 0;
+
+  complex16 * expectedA = new complex16[20] {{10.,-20.}, { 0.5, 0.}, { 0.8999999999999999,  0.}, { 0.8, 0.}, { 0.1,  0.}, {19.,-38.}, {-0.5,  1.}, { 0.1999999999999957,  0.}, { 0.4000000000000021,  0.}, {-0.1999999999999998,  0.}, {29.,-58.}, {-4.5,  9.}, {-6.2000000000000171, 12.4000000000000341}, { 0.0645161290322568,  0.}, { 0.1290322580645157,  0.}, {21.,-42.}, {-2.5000000000000000,  5.}, {-3.4000000000000092,  6.8000000000000185}, {12.4193548387096779,-24.8387096774193559}, { 0.1480519480519480,  0.}};
+
+  int * expectedIPIV = new int[4]{3,3,3,4};
+
+  complex16 * Acpy = new complex16[20];
+  std::copy(ccondok5x4,ccondok5x4+m*n,Acpy);
+  int * ipiv = new int[minmn]();
+  lapack::xgetrf(&m,&n,Acpy,&m,ipiv,&INFO);
+
+  EXPECT_TRUE(ArrayBitEquals(expectedIPIV,ipiv,4));
+  EXPECT_TRUE(ArrayFuzzyEquals(expectedA,Acpy,20));
+
+  delete [] ipiv;
+  delete [] expectedIPIV;
+  delete [] Acpy;
+  delete [] expectedA;
 }
 
 // Check successful templating of dtrcon.

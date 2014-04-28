@@ -92,6 +92,16 @@ extern "C"
 #endif
 void F77FUNC(ztrcon)(char * NORM, char * UPLO, char * DIAG, int * N, complex16 * A, int * LDA, real16 * RCOND, complex16 * WORK, real16 * IWORK, int * INFO);
 
+// LUP decomposition
+#ifdef __cplusplus
+extern "C" 
+#endif
+void F77FUNC(dgetrf)(int * M, int * N, real16 * A, int * LDA, int * IPIV, int *INFO);
+#ifdef __cplusplus
+extern "C" 
+#endif
+void F77FUNC(zgetrf)(int * M, int * N, complex16 * A, int * LDA, int * IPIV, int *INFO);
+
 
 // solves a triangular system of the form : A * X = B  or  A**T * X = B
 #ifdef __cplusplus

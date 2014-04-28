@@ -124,6 +124,17 @@ namespace detail
   {
     F77FUNC(ztrtrs)(UPLO, TRANS, DIAG, N, NRHS, A, LDA, B, LDB, INFO);
   }
+
+  //xGETRF specialisations
+  template<> void xgetrf(int * M, int * N, real16 * A, int * LDA, int * IPIV, int *INFO)
+  {
+    F77FUNC(dgetrf)(M,N,A,LDA,IPIV,INFO);
+  }
+
+  template<> void xgetrf(int * M, int * N, complex16 * A, int * LDA, int * IPIV, int *INFO)
+  {
+    F77FUNC(zgetrf)(M,N,A,LDA,IPIV,INFO);
+  }
 }
 
 // f77 constants
@@ -254,6 +265,29 @@ template<>  void xgesvd(char * JOBU, char * JOBVT, int * M, int * N, complex16 *
     throw rdag_error("LAPACK::zgesvd, internal call to zbdsqr did not converge.");
   }
 }
+
+template<typename T> void xgetrf(int * M, int * N, T * A, int * LDA, int * IPIV, int *INFO)
+{
+  set_xerbla_death_switch(lapack::izero);
+  detail::xgetrf(M,N,A,LDA,IPIV,INFO);
+  if(*INFO!=0)
+  {
+    stringstream message;
+    if(*INFO<0)
+    {
+      message << "Input to LAPACK::xgetrf call incorrect at arg: " << *INFO;
+      throw rdag_error(message.str());
+    }
+    else
+    {
+      message << "LAPACK::xgetrf, matrix is singular at pivot [" << *INFO << "]";
+      std::cerr << message.str(); // TODO put this in logs
+    }
+  }
+}
+template void xgetrf<real16>(int * M, int * N, real16 * A, int * LDA, int * IPIV, int *INFO);
+template void xgetrf<complex16>(int * M, int * N, complex16 * A, int * LDA, int * IPIV, int *INFO);
+
 
 template<> void xtrcon(char * NORM, char * UPLO, char * DIAG, int * N, real16 * A, int * LDA, real16 * RCOND, int * INFO)
 {
