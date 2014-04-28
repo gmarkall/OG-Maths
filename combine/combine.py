@@ -4,7 +4,13 @@
 # Please see distribution for license.
 #
 
-# TODO: Zip compression of jar
+"""Takes platform-specific blobs and creates a platform-independent
+blob that consists of a platform independent main jar and the tests,
+sources and javadoc jars. 
+
+Verinfo from each blob is combined to produce a single verinfo file
+with information about the builds that the combined main jar came
+from."""
 
 import random, string, sys, os, zipfile
 from pprint import pprint
@@ -15,6 +21,9 @@ try:
 except ImportError:
     from yaml import Loader, Dumper
 
+# Whether to output information about what's going on. This is left
+# True, since we hypothesise it will be useful information to keep
+# in the logs.
 DEBUG = True
 
 def main():
@@ -130,8 +139,9 @@ def construct_combined_verinfo(verinfos, buildnumber):
     return newverinfo
 
 def create_combined_blob(newverinfo, verinfos, mainjar):
-    """Creates a new blob and puts everything in it apart from the main Jar, which
-    will require a little more work."""
+    """Creates a new blob and puts everything in it. The main jar's data is
+    passed in mainjar, since its creation requires a lot of other steps to
+    be taken, and it is kept separate from the blob creation."""
     blobname = '%s-%s-%s.zip' % (newverinfo['project'], newverinfo['version'], newverinfo['buildnumber'])
     blob = zipfile.ZipFile(blobname, 'w')
     # Open up the Linux blob to read the static artifacts from it
@@ -165,11 +175,9 @@ def create_combined_blob(newverinfo, verinfos, mainjar):
     blob.close()
     return blobname
 
-def finalise_combined_blob(blob):
-    blob.close()
-
 def create_main_jar(newverinfo, verinfos):
     """Combines the three platform jars to create a single main jar"""
+    
     class MagicStringIO(StringIO):
         """A StringIO object whose buffer persists after having close()
         called - this is required so the ZipFile wrapping it can write
@@ -257,8 +265,6 @@ def write_verinfo(verinfo):
         print "Writing verinfo.yaml to current dir"""
     with open('verinfo.yaml', 'w') as f:
         f.write(dump(verinfo, Dumper=Dumper))
-
-# Need to add the main jar to the blob in a fn or do the jar making before the blob making.
 
 if __name__ == '__main__':
     sys.exit(main())
