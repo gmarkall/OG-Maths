@@ -39,6 +39,17 @@ extern "C"
 #endif
 void F77FUNC(zscal)(int * N, complex16 * DA, complex16* DX, int * INCX);
 
+// Standard xSWAP
+#ifdef __cplusplus
+extern "C" 
+#endif
+void F77FUNC(dswap)(int * N, real16 * DX, int * INCX, real16 * DY, int * INCY);
+#ifdef __cplusplus
+extern "C" 
+#endif
+void F77FUNC(zswap)(int * N, complex16 * DX, int * INCX, complex16 * DY, int * INCY);
+
+
 // Standard xGEMV
 #ifdef __cplusplus
 extern "C" 

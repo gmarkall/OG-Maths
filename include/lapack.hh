@@ -39,6 +39,7 @@ extern complex16 czero;
 template<typename T>char charmagic();
 
 template<typename T> void xscal(int * N, T * DA, T * DX, int * INCX);
+template<typename T>void xswap(int * N, T * DX, int * INCX, T * DY, int * INCY);
 template<typename T> void xgemv(char * TRANS, int * M, int * N, T * ALPHA, T * A, int * LDA, T * X, int * INCX, T * BETA, T * Y, int * INCY );
 template<typename T> void xgemm(char * TRANSA, char * TRANSB, int * M, int * N, int * K, T * ALPHA, T * A, int * LDA, T * B, int * LDB, T * BETA, T * C, int * LDC );
 template<typename T> real16 xnrm2(int * N, T * X, int * INCX);
@@ -118,6 +119,17 @@ extern complex16 * czero;
  * @param INCX as BLAS dscal INCX
  */
 template<typename T> void xscal(int * N, T * DA, T * DX, int * INCX);
+
+/**
+ * xswap generalised vector interchange
+ * @param N as BLAS dswap N
+ * @param DX data type specific with intent as BLAS dswap DX
+ * @param INCX as BLAS dswap INCX
+ * @param DY data type specific with intent as BLAS dswap DY
+ * @param INCY as BLAS dswap INCY
+ */
+template<typename T>void xswap(int * N, T * DX, int * INCX, T * DY, int * INCY);
+
 
 /**
  * xgemv generalised matrix vector multiplication.

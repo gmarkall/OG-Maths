@@ -49,6 +49,17 @@ namespace detail
     F77FUNC(zscal)(N, DA, DX, INCX);
   }
 
+  // xSWAP specialisations
+  template<> void xswap(int * N, real16 * DX, int * INCX, real16 * DY, int * INCY)
+  {
+    F77FUNC(dswap)(N, DX, INCX, DY, INCY);
+  }
+
+  template<> void xswap(int * N, complex16 * DX, int * INCX, complex16 * DY, int * INCY)
+  {
+    F77FUNC(zswap)(N, DX, INCX, DY, INCY);
+  }
+
   // xGEMV specialisations
   template<> void xgemv(char * TRANS, int * M, int * N, real16 * ALPHA, real16 * A, int * LDA, real16 * X, int * INCX, real16 * BETA, real16 * Y, int * INCY )
   {
@@ -161,6 +172,16 @@ template<typename T> void xscal(int * N, T * DA, T * DX, int * INCX)
 }
 template void xscal<real16>(int * N, real16 * DA, real16 * DX, int * INCX);
 template void xscal<complex16>(int * N, complex16 * DA, complex16 * DX, int * INCX);
+
+// xSWAP
+template<typename T> void xswap(int * N, T * DX, int * INCX, T * DY, int * INCY)
+{
+  set_xerbla_death_switch(lapack::izero);
+  detail::xswap(N, DX, INCX, DY, INCY);
+}
+template void xswap<real16>(int * N, real16 * DX, int * INCX, real16 * DY, int * INCY);
+template void xswap<complex16>(int * N, complex16 * DX, int * INCX, complex16 * DY, int * INCY);
+
 
 // xGEMV
 template<typename T> void

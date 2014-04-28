@@ -69,6 +69,42 @@ TEST(LAPACKTest_xscal, zscal) {
   delete[] expected;
 }
 
+// Check successful templating of dswap.
+TEST(LAPACKTest_xswap, dswap) {
+  int N = 4;
+  real16 * x = new real16[8]{1,2,3,4,5,6,7,8};
+  real16 * y = new real16[8]{-1,-2,-3,-4,-5,-6,-7,-8};
+  real16 * expectedx = new real16[8]{-1,-2,-3,-4,5,6,7,8};
+  real16 * expectedy = new real16[8]{1,2,3,4,-5,-6,-7,-8};
+
+  lapack::xswap(&N, x, lapack::ione, y, lapack::ione);
+  EXPECT_TRUE(ArrayFuzzyEquals(expectedx,x,8));
+  EXPECT_TRUE(ArrayFuzzyEquals(expectedy,y,8));
+
+  delete[] x;
+  delete[] y;
+  delete[] expectedx;
+  delete[] expectedy;
+}
+
+// Check successful templating of zswap.
+TEST(LAPACKTest_xswap, zswap) {
+  int N = 4;
+  complex16 * x = new complex16[8]{{1,10},{2,20},{3,30},{4,40},{5,50},{6,60},{7,70},{8,80}};
+  complex16 * y = new complex16[8]{{-1,-10},{-2,-20},{-3,-30},{-4,-40},{-5,-50},{-6,-60},{-7,-70},{-8,-80}};
+  complex16 * expectedx = new complex16[8]{{-1,-10},{-2,-20},{-3,-30},{-4,-40},{5,50},{6,60},{7,70},{8,80}};
+  complex16 * expectedy = new complex16[8]{{1,10},{2,20},{3,30},{4,40},{-5,-50},{-6,-60},{-7,-70},{-8,-80}};
+
+  lapack::xswap(&N, x, lapack::ione, y, lapack::ione);
+  EXPECT_TRUE(ArrayFuzzyEquals(expectedx,x,8));
+  EXPECT_TRUE(ArrayFuzzyEquals(expectedy,y,8));
+
+  delete[] x;
+  delete[] y;
+  delete[] expectedx;
+  delete[] expectedy;
+}
+
 // Check successful templating of dgemv
 TEST(LAPACKTest_xgemv, dgemv) {
 
