@@ -4,6 +4,11 @@
 # Please see distribution for license.
 #
 
+"""This tool creates a version info file for an OG-Maths build on
+the current platform. Version info is a yaml file containing
+the revision number, build number, version number, project name,
+and list of artifacts."""
+
 import platform, sys, subprocess
 from yaml import load, dump
 try:
@@ -14,6 +19,7 @@ except ImportError:
 jars = [ None, 'javadoc', 'sources', 'tests' ]
 
 def jarname(version, suffix):
+    """Determines the name of an OG-Maths Jar."""
     if suffix is None:
         suffix = ''
     else:
@@ -21,6 +27,8 @@ def jarname(version, suffix):
     return 'jars/og-maths-%s-%s%s.jar' % (platform_code(), version, suffix)
 
 def platform_code():
+    """Returns the current platform code, following the usual convention
+    for OG-Maths."""
     p = platform.system()
     if p == 'Linux':
         return 'lnx'
@@ -30,6 +38,8 @@ def platform_code():
         return 'win'
 
 def get_subprojects(lapack_verinfo_file):
+    """Returns a list of verinfo data for the OG-Maths subprojects. At the
+    moment, the only OG-Maths subproject is OG-Lapack."""
     with open(lapack_verinfo_file, 'r') as f:
         lapack_verinfo = load(f, Loader=Loader)
     if len(lapack_verinfo['platforms']) != 1 or lapack_verinfo['platforms'][0] != platform_code():
@@ -37,6 +47,8 @@ def get_subprojects(lapack_verinfo_file):
     return [lapack_verinfo]
 
 def generate_verinfo(project, version, revision, lapack_verinfo_file, buildnumber):
+    """Generates a dict containing the verinfo for this build, incorporating
+    the values passed in its parameters."""
     artifacts = [ jarname (version, jar) for jar in jars ]
     subprojects = get_subprojects(lapack_verinfo_file)
     try:
