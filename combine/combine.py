@@ -266,7 +266,7 @@ def copy_platform_libs_from_jar(platform, verinfos, destjar):
     the dest jar. The verinfos are required to find the name of the
     source blob for the given platform's source jar."""
     k = [s for s in verinfos.keys() if platform in s][0]
-    blob = zipfile.ZipFile(k, 'r')
+    srcblob = zipfile.ZipFile(k, 'r')
     artifacts = verinfos[k]['artifacts']
     srcjarname = [s for s in artifacts if not ('javadoc' in s or 'sources' in s or 'tests' in s)][0]
     zfile = StringIO(srcblob.read(srcjarname))
