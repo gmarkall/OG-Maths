@@ -4,6 +4,8 @@
 # Please see distribution for license.
 #
 
+"""Tests for the verinfo reading and combining."""
+
 import unittest
 from copy import deepcopy
 from combine import read_version_info, validate_version_info, construct_combined_verinfo
