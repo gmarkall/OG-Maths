@@ -4,6 +4,12 @@
 # Please see distribution for license.
 #
 
+'''This tool creates a "blob" file. A blob consists of a set of artifacts
+and a verinfo file describing them, wrapped up in a zip file. Blobs are
+used so that artifacts can be uploaded with information about their build
+in a single file, either to the buildmaster, or another machine being
+used to host built code.'''
+
 import sys, os, zipfile
 from yaml import load, dump
 try:
