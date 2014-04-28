@@ -29,8 +29,9 @@ def main():
     validate_version_info(verinfos)
     newverinfo = construct_combined_verinfo(verinfos, buildnumber)
     mainjar = create_main_jar(newverinfo, verinfos)
-    create_combined_blob(newverinfo, verinfos, mainjar)
+    blobname = create_combined_blob(newverinfo, verinfos, mainjar)
     write_verinfo(newverinfo)
+    print 'Blob name: %s' % blobname
     return 0
 
 def read_version_info(sourceblobs):
@@ -162,6 +163,7 @@ def create_combined_blob(newverinfo, verinfos, mainjar):
         print "Adding verinfo.yaml to blob"
     blob.writestr('verinfo.yaml', dump(newverinfo, Dumper=Dumper))
     blob.close()
+    return blobname
 
 def finalise_combined_blob(blob):
     blob.close()
