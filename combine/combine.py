@@ -193,7 +193,7 @@ def create_main_jar(newverinfo, verinfos):
                 del self.buf, self.pos
 
     jardata = MagicStringIO()
-    jar = zipfile.ZipFile(jardata, 'w')
+    jar = zipfile.ZipFile(jardata, 'w', compression=zipfile.ZIP_DEFLATED)
     # Open the linux blob to get everything out except verinfo, then put it in the new jar
     k = [s for s in verinfos.keys() if 'lnx' in s][0]
     srcblob = zipfile.ZipFile(k, 'r')
