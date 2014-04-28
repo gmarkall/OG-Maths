@@ -39,6 +39,9 @@ complex16 cspd[16] = {{ 50,   0}, { 90,  -9}, {100, -10}, { 80,  -8}, { 90,   9}
 real16 rcondok5x4[20] =  {5,9,10,8,1,9,17,19,15,2,10,19,29,21,3,8,15,21,28,4};
 complex16 ccondok5x4[20] = {{5.,-10.}, {9.,-18.}, {10.,-20.}, {8.,-16.}, {1.,-2.}, {9.,-18.}, {17.,-34.}, {19.,-38.}, {15.,-30.}, {2.,-4.}, {10.,-20.}, {19.,-38.}, {29.,-58.}, {21.,-42.}, {3.,-6.}, {8.,-16.}, {15.,-30.}, {21.,-42.}, {28.,-56.}, {4.,-8.}};
 
+// singular 3x3
+real16 rsingular3x3[9] = {1,10,1,2,20,2,3,30,3};
+complex16 csingular3x3[9] = {{1,10},{10,100},{1,10},{2,20},{20,200},{2,20},{3,30},{30,300},{3,30}};
 
 // Check successful templating of dscal.
 TEST(LAPACKTest_xscal, dscal) {
@@ -311,6 +314,17 @@ TEST(LAPACKTest_xgetrf, dgetrf) {
   EXPECT_TRUE(ArrayBitEquals(expectedIPIV,ipiv,4));
   EXPECT_TRUE(ArrayFuzzyEquals(expectedA,Acpy,20));
 
+  // check throw on bad arg
+  std::copy(rcondok5x4,rcondok5x4+m*n,Acpy);
+  m = -1;
+  EXPECT_THROW(lapack::xgetrf(&m,&n,Acpy,&m,ipiv,&INFO), rdag_error);
+
+  // check throw on singular
+  m=3;
+  n=3;
+  std::copy(rsingular3x3,rsingular3x3+m*n,Acpy);
+  EXPECT_THROW(lapack::xgetrf(&m,&n,Acpy,&m,ipiv,&INFO), rdag_error);
+
   delete [] ipiv;
   delete [] expectedIPIV;
   delete [] Acpy;
@@ -335,6 +349,17 @@ TEST(LAPACKTest_xgetrf, zgetrf) {
 
   EXPECT_TRUE(ArrayBitEquals(expectedIPIV,ipiv,4));
   EXPECT_TRUE(ArrayFuzzyEquals(expectedA,Acpy,20));
+
+  // check throw on bad arg
+  std::copy(rcondok5x4,rcondok5x4+m*n,Acpy);
+  m = -1;
+  EXPECT_THROW(lapack::xgetrf(&m,&n,Acpy,&m,ipiv,&INFO), rdag_error);
+
+  // check throw on singular
+  m=3;
+  n=3;
+  std::copy(csingular3x3,csingular3x3+m*n,Acpy);
+  EXPECT_THROW(lapack::xgetrf(&m,&n,Acpy,&m,ipiv,&INFO), rdag_error);
 
   delete [] ipiv;
   delete [] expectedIPIV;

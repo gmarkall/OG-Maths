@@ -276,13 +276,12 @@ template<typename T> void xgetrf(int * M, int * N, T * A, int * LDA, int * IPIV,
     if(*INFO<0)
     {
       message << "Input to LAPACK::xgetrf call incorrect at arg: " << *INFO;
-      throw rdag_error(message.str());
     }
     else
     {
       message << "LAPACK::xgetrf, matrix is singular at pivot [" << *INFO << "]";
-      std::cerr << message.str(); // TODO put this in logs
     }
+    throw rdag_error(message.str());
   }
 }
 template void xgetrf<real16>(int * M, int * N, real16 * A, int * LDA, int * IPIV, int *INFO);
