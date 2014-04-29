@@ -30,14 +30,14 @@ template<typename T> void lu_dense_runner(RegContainer& reg, const OGMatrix<T>* 
   int info = 0;
 
   T * L = new T[mn]();
-  T * U = new T[mn]();
+  T * U = new T[n*n]();
 
   // copy A else it's destroyed
   T * A = new T[mn];
   std::memcpy(A, arg->getData(), sizeof(T)*mn);
 
   // create pivot vector
-  int * ipiv = new int[minmn];
+  int * ipiv = new int[minmn]();
 
   // call lapack
   try
@@ -73,20 +73,19 @@ template<typename T> void lu_dense_runner(RegContainer& reg, const OGMatrix<T>* 
     }
   }
 
-  // Transpose the pivot...
-  int * perm = new int[minmn];
-  // turn into 0 based indexing, write 1 onto diag of A too, will need later
+  // Transpose the pivot... create as permutation
+  int * perm = new int[m];
+  // 1) turn into 0 based indexing
   for (int i = 0; i < minmn; i++)
   {
     ipiv[i] -= 1;
-    A[m*i+i] = 1.e0;
   }
-  // 0:minmn range vector, will be permuted in a tick
-  for (int i = 0; i < minmn; i++)
+  // 2) 0:m-1 range vector, will be permuted in a tick
+  for (int i = 0; i < m; i++)
   {
     perm[i] = i;
   }
-  // apply permutation to range indexed vector, just walk through in order and apply the swaps
+  // 3) apply permutation to range indexed vector, just walk through in order and apply the swaps
   int swp;
   for (int i = 0; i < minmn; i++)
   {
@@ -100,20 +99,25 @@ template<typename T> void lu_dense_runner(RegContainer& reg, const OGMatrix<T>* 
     }
   }
 
-  // apply pivot during assign to L
-  for (int i = 0; i < minmn; i++)
+  // kill triu of A, write 1 onto diag of A too
+  A[0] = 1.e0;
+  for (int i = 1; i < n; i++)
   {
-    int im = i * m;
-    for (int j = i; j < n; j++)
+    A[m*i+i] = 1.e0;
+    for (int j = 0; j < i; j++)
     {
-      L[im + perm[j]] = A[im + j];
+      A[i*m+j]=0.e0;
     }
   }
-  // copy in rest of decomposed matrix
-  int remaining = m - minmn;
-  for (int i = 0; i < n; i++)
+
+  // apply pivot during assign to L
+  for (int i = 0; i < m; i++)
   {
-      std::copy(&A[minmn+i*m],&A[minmn+i*m+remaining],&L[minmn+i*m]);
+    int row = perm[perm[i]];
+    for (int j = 0; j < n; j++)
+    {
+      L[j*m+i] = A[j*m+row];
+    }
   }
 
   delete[] ipiv;
