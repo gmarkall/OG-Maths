@@ -29,8 +29,12 @@ template<typename T> void lu_dense_runner(RegContainer& reg, const OGMatrix<T>* 
   int mn = m * n;
   int info = 0;
 
-  T * L = new T[mn]();
-  T * U = new T[n*n]();
+// Sizes of output
+//   L = [m x minmn ]
+//   U = [minmn x n]
+
+  T * L = new T[m*minmn]();
+  T * U = new T[minmn*n]();
 
   // copy A else it's destroyed
   T * A = new T[mn];
@@ -60,14 +64,25 @@ template<typename T> void lu_dense_runner(RegContainer& reg, const OGMatrix<T>* 
     }
   }
 
-  // The following is from DOGMAv1
+  // The following is adapted from DOGMAv1
 
-  // extract U
-  for (int i = 0; i < n; i++)
+  // extract U, get triangle, then square
+  // U strides in 'minmn', A strides in 'm'
+  int lim = minmn > n ? n : minmn;
+  for (int i = 0; i < lim - 1; i++)
   {
     int mi = m * i;
-    int ni = n * i;
+    int ni = minmn * i;
     for (int j = 0; j <= i; j++)
+    {
+      U[ni + j] = A[mi + j];
+    }
+  }
+  for (int i = lim - 1; i < n; i++)
+  {
+    int mi = m * i;
+    int ni = minmn * i;
+    for (int j = 0; j < minmn; j++)
     {
       U[ni + j] = A[mi + j];
     }
@@ -101,7 +116,7 @@ template<typename T> void lu_dense_runner(RegContainer& reg, const OGMatrix<T>* 
 
   // kill triu of A, write 1 onto diag of A too
   A[0] = 1.e0;
-  for (int i = 1; i < n; i++)
+  for (int i = 1; i < minmn; i++)
   {
     A[m*i+i] = 1.e0;
     for (int j = 0; j < i; j++)
@@ -113,10 +128,23 @@ template<typename T> void lu_dense_runner(RegContainer& reg, const OGMatrix<T>* 
   // apply pivot during assign to L
   for (int i = 0; i < m; i++)
   {
-    int row = perm[perm[i]];
-    for (int j = 0; j < n; j++)
+    int permi = perm[i];
+    int row = perm[permi];
+    if(row==i)
     {
-      L[j*m+i] = A[j*m+row];
+      for (int j = 0; j < minmn; j++)
+      {
+        int jm = j*m;
+        L[jm+i] = A[jm+permi];
+      }
+    }
+    else
+    {
+      for (int j = 0; j < minmn; j++)
+      {
+        int jm = j*m;
+        L[jm+i] = A[jm+row];
+      }
     }
   }
 
@@ -124,8 +152,11 @@ template<typename T> void lu_dense_runner(RegContainer& reg, const OGMatrix<T>* 
   delete[] A;
   delete[] perm;
 
-  reg.push_back(makeConcreteDenseMatrix(L, m, n, OWNER));
-  reg.push_back(makeConcreteDenseMatrix(U, n, n, OWNER));
+  OGTerminal * cL = makeConcreteDenseMatrix(L, m, minmn, OWNER);
+  OGTerminal * cU = makeConcreteDenseMatrix(U, minmn, n, OWNER);
+
+  reg.push_back(cL);
+  reg.push_back(cU);
 }
 
 void *

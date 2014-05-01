@@ -43,7 +43,7 @@ public class OGLUResult {
    * Gets U, the upper triangular matrix.
    * @return the upper triangular matrix.
    */
-  public final OGNumeric getS() {
+  public final OGNumeric getU() {
     return this._result.get(1);
   }
 
