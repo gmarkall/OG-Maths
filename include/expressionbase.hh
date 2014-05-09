@@ -7,6 +7,7 @@
 #ifndef _EXPRESSIONBASE_HH
 #define _EXPRESSIONBASE_HH
 
+#include <memory>
 #include "numeric.hh"
 #include "visitor.hh"
 #include "containers.hh"
@@ -25,7 +26,7 @@ namespace librdag
  */
 
 typedef PtrVector<const OGNumeric*> ArgContainer;
-typedef PtrVector<const OGNumeric*>  RegContainer;
+typedef vector<pOGNumeric> RegContainer;
 
 /**
  *  Expr type

@@ -38,7 +38,7 @@ template<typename T> void * mtimes_dense_runner(RegContainer& reg0, const OGMatr
   // Fortran vars
   T fp_one = 1.e0;
 
-  OGTerminal * ret = nullptr;
+  pOGNumeric ret;
 
   if (colsArray1 == 1 && rowsArray1 == 1) { // We have scalar * matrix
     T deref = data1[0];
@@ -103,7 +103,7 @@ void * MTIMESRunner::run(RegContainer& reg0, const OGRealMatrix*    arg0, const 
 void *
 MTIMESRunner::run(RegContainer& reg0, const OGRealScalar* arg0, const OGRealScalar* arg1) const
 {
-    OGTerminal * ret = new OGRealScalar(arg0->getValue()*arg1->getValue());
+    pOGNumeric ret = pOGNumeric{new OGRealScalar(arg0->getValue()*arg1->getValue())};
     reg0.push_back(ret);
     return nullptr;
 }

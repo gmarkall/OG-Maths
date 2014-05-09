@@ -25,8 +25,7 @@ namespace librdag {
 void *
 TRANSPOSERunner::run(RegContainer& reg, OGRealScalar const * arg) const
 {
-  const OGRealScalar* ret;
-  ret = new OGRealScalar(arg->getValue());
+  pOGNumeric ret = pOGNumeric{new OGRealScalar(arg->getValue())};
   reg.push_back(ret);
   return nullptr;
 }
@@ -35,7 +34,7 @@ template<typename T>
 void
 transpose_dense_runner(RegContainer& reg, OGMatrix<T> const * arg)
 {
-  const OGTerminal* ret = nullptr; // the returned item
+  pOGNumeric ret; // the returned item
 
   // Matrix in scalar context, i.e. a 1x1 matrix, transpose is simply value
   if(arg->getRows()==1 && arg->getCols()==1)

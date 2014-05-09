@@ -84,7 +84,7 @@ CheckUnary<T>::execute()
     delete v;
   }
   const RegContainer& regs = node->getRegs();
-  const OGNumeric * answer = regs[0];
+  pOGNumeric answer = regs[0];
   this->_resultPair = new ResultPair(answer->asOGTerminal()->createOwningCopy(), this->getExpected());
   delete node;
   delete el1;
@@ -150,7 +150,7 @@ CheckBinary<T>::execute()
     delete v;
   }
   const RegContainer& regs = node->getRegs();
-  const OGNumeric* answer = regs[0];
+  pOGNumeric answer = regs[0];
   this->_resultPair = new ResultPair(answer->asOGTerminal()->createOwningCopy(), this->getExpected());
   delete node;
   delete el1;

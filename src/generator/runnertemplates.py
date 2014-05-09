@@ -68,7 +68,7 @@ binary_runner_function =  """\
 void *
 %(nodename)sRunner::run(RegContainer& reg0, const %(arg0type)s* arg0, const %(arg1type)s* arg1) const
 {
-  const %(returntype)s* ret;
+  pOGNumeric ret;
 %(implementation)s
   reg0.push_back(ret);
   return nullptr;
@@ -91,7 +91,7 @@ class %(nodename)sRunner: public DispatchVoidOp, private Uncopyable
 # Infix runner
 
 infix_scalar_runner_implementation = """\
-  ret = new %(returntype)s(arg0->getValue() %(symbol)s arg1->getValue());\
+  ret = pOGNumeric{new %(returntype)s(arg0->getValue() %(symbol)s arg1->getValue())};\
 """
 
 infix_matrix_runner_implementation = """\
@@ -173,7 +173,7 @@ infix_matrix_runner_implementation = """\
     }
   }
 
-  ret = new %(returntype)s(newData, newRows, newCols, OWNER);
+  ret = pOGNumeric{new %(returntype)s(newData, newRows, newCols, OWNER)};
 """
 
 # Unary runner
@@ -192,7 +192,7 @@ unary_runner_function = """\
 void *
 %(nodename)sRunner::run(RegContainer& reg, const %(argtype)s* arg) const
 {
-  const %(returntype)s* ret;
+  pOGNumeric ret;
 %(implementation)s
   reg.push_back(ret);
   return nullptr;
@@ -203,7 +203,7 @@ void *
 # Prefix runner
 
 prefix_scalar_runner_implementation = """\
-  ret = new %(returntype)s(%(symbol)s(arg->getValue()));\
+  ret = pOGNumeric{new %(returntype)s(%(symbol)s(arg->getValue()))};\
 """
 
 prefix_matrix_runner_implementation = """\
@@ -214,13 +214,13 @@ prefix_matrix_runner_implementation = """\
   {
     newData[i] = %(symbol)sdata[i];
   }
-  ret = new %(returntype)s(newData, arg->getRows(), arg->getCols(), OWNER);
+  ret = pOGNumeric{new %(returntype)s(newData, arg->getRows(), arg->getCols(), OWNER)};
 """
 
 # UnaryFunction runner
 
 unaryfunction_scalar_runner_implementation = """\
-  ret = new %(returntype)s(%(function)s(arg->getValue()));\
+  ret = pOGNumeric{new %(returntype)s(%(function)s(arg->getValue()))};\
 """
 
 unaryfunction_matrix_runner_implementation = """\
@@ -231,7 +231,8 @@ unaryfunction_matrix_runner_implementation = """\
   {
     newData[i] = %(function)s(data[i]);
   }
-  ret = new %(returntype)s(newData, arg->getRows(), arg->getCols(), OWNER);
+  ret = pOGNumeric{new %(returntype)s(newData, arg->getRows(), arg->getCols(), OWNER)};
+
 """
 
 # Unimplemented runners

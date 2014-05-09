@@ -19,12 +19,7 @@ namespace librdag
  * OGExpr
  */
 
-OGExpr::OGExpr()
-{
-  // _regs are safe to immediately own their contents because we don't put anything
-  // in them during construction.
-  _regs.set_ownership(true);
-}
+OGExpr::OGExpr() {}
 
 OGExpr::~OGExpr() {}
 

@@ -1536,28 +1536,28 @@ OGComplexSparseMatrix::createComplexOwningCopy() const
 
 // Concrete template factory for dense matrices
 template<>
-OGTerminal * makeConcreteDenseMatrix(real16 * data, int rows, int cols, DATA_ACCESS access)
+pOGNumeric makeConcreteDenseMatrix(real16 * data, int rows, int cols, DATA_ACCESS access)
 {
-  return new OGRealMatrix(data, rows, cols, access);
+  return pOGNumeric{new OGRealMatrix(data, rows, cols, access)};
 }
 
 template<>
-OGTerminal * makeConcreteDenseMatrix(complex16 * data, int rows, int cols, DATA_ACCESS access)
+pOGNumeric makeConcreteDenseMatrix(complex16 * data, int rows, int cols, DATA_ACCESS access)
 {
-  return new OGComplexMatrix(data, rows, cols, access);
+  return pOGNumeric{new OGComplexMatrix(data, rows, cols, access)};
 }
 
 // Concrete template factory for scalars
 template<>
-OGTerminal * makeConcreteScalar(real16 data)
+pOGNumeric makeConcreteScalar(real16 data)
 {
-  return new OGRealScalar(data);
+  return pOGNumeric{new OGRealScalar(data)};
 }
 
 template<>
-OGTerminal * makeConcreteScalar(complex16 data)
+pOGNumeric makeConcreteScalar(complex16 data)
 {
-  return new OGComplexScalar(data);
+  return pOGNumeric{new OGComplexScalar(data)};
 }
 
 } // namespace librdag

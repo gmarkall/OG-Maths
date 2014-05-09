@@ -38,7 +38,7 @@ TEST(SVDTests,CheckScalar)
   {
     d->dispatch(*it);
   }
-  const OGNumeric * answer = s0->getRegs()[0];
+  pOGNumeric answer = s0->getRegs()[0];
   EXPECT_TRUE((*one) ==~ (*(answer->asOGTerminal())));
 
   // Check selecting 1 (S)
@@ -86,7 +86,7 @@ TEST(SVDTests,CheckRealMatrix)
   SVD* svd = new SVD(M);
 
   // computed answer pointers
-  const OGNumeric * answerU, * answerS, * answerVT, * reconstruct;
+  pOGNumeric answerU, answerS, answerVT, reconstruct;
 
   Dispatcher * d = new Dispatcher();
 
@@ -163,7 +163,7 @@ TEST(SVDTests,CheckComplexMatrix)
   SVD* svd = new SVD(M);
 
   // computed answer pointers
-  const OGNumeric * answerU, * answerS, * answerVT, * reconstruct;
+  pOGNumeric answerU, answerS, answerVT, reconstruct;
 
   Dispatcher * d = new Dispatcher();
 

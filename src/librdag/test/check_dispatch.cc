@@ -40,7 +40,7 @@ TEST(DispatchTest, SimpleTest) {
     dispatchfn(val);
   }
   const RegContainer& reg = plus->getRegs();
-  const OGNumeric * answer = reg[0];
+  pOGNumeric answer = reg[0];
   answer->debug_print();
   delete plus;
   delete el1;

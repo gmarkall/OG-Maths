@@ -28,7 +28,7 @@ SELECTRESULTRunner::eval(RegContainer& reg, const RegContainer& arg0, OGIntegerS
 void*
 SELECTRESULTRunner::run(RegContainer& reg0, const RegContainer& arg0, const OGIntegerScalar* arg1) const
 {
-  reg0.push_back(arg0[arg1->getValue()]->copy());
+  reg0.push_back(arg0[arg1->getValue()]);
   return nullptr;
 }
 

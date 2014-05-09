@@ -151,6 +151,7 @@ numeric_hh = """\
 #ifndef _NUMERIC_HH
 #define _NUMERIC_HH
 
+#include <memory>
 #include "uncopyable.hh"
 #include "exprtypeenum.h"
 
@@ -219,6 +220,8 @@ class OGNumeric: private Uncopyable
     virtual const OGComplexSparseMatrix* asOGComplexSparseMatrix() const;
     virtual ExprType_t getType() const;
 };
+
+typedef std::shared_ptr<const OGNumeric> pOGNumeric;
 
 }
 #endif // _NUMERIC_HH

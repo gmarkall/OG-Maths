@@ -5,6 +5,9 @@
  *
  */
 
+#include <complex>
+#include <sstream>
+
 #include "dispatch.hh"
 #include "runners.hh"
 #include "expression.hh"
@@ -12,10 +15,6 @@
 #include "terminal.hh"
 #include "uncopyable.hh"
 #include "lapack.hh"
-
-#include <stdio.h>
-#include <complex>
-#include <sstream>
 
 /*
  *  Unit contains code for CTRANSPOSE node runners
@@ -25,8 +24,7 @@ namespace librdag {
 void *
 CTRANSPOSERunner::run(RegContainer& reg, OGRealScalar const * arg) const
 {
-  const OGRealScalar* ret;
-  ret = new OGRealScalar(arg->getValue());
+  pOGNumeric ret = pOGNumeric{new OGRealScalar(arg->getValue())};
   reg.push_back(ret);
   return nullptr;
 }
@@ -35,7 +33,7 @@ template<typename T>
 void
 ctranspose_dense_runner(RegContainer& reg, OGMatrix<T> const * arg)
 {
-  const OGTerminal* ret = nullptr; // the returned item
+  pOGNumeric ret; // the returned item
 
   // Matrix in scalar context, i.e. a 1x1 matrix, transpose is simply value
   if(arg->getRows()==1 && arg->getCols()==1)

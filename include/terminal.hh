@@ -456,12 +456,12 @@ class OGComplexSparseMatrix: public OGSparseMatrix<complex16>
  * @return a non-templated OGMatrix object.
  */
 template<typename T>
-OGTerminal * makeConcreteDenseMatrix(T * data, int rows, int cols, DATA_ACCESS access);
+pOGNumeric makeConcreteDenseMatrix(T * data, int rows, int cols, DATA_ACCESS access);
 // PTS
 template<>
-OGTerminal * makeConcreteDenseMatrix(real16 * data, int rows, int cols, DATA_ACCESS access);
+pOGNumeric makeConcreteDenseMatrix(real16 * data, int rows, int cols, DATA_ACCESS access);
 template<>
-OGTerminal * makeConcreteDenseMatrix(complex16 * data, int rows, int cols, DATA_ACCESS access);
+pOGNumeric makeConcreteDenseMatrix(complex16 * data, int rows, int cols, DATA_ACCESS access);
 
 /**
  * Creates a non-templated OGScalar object based on the type of data \a T.
@@ -470,12 +470,12 @@ OGTerminal * makeConcreteDenseMatrix(complex16 * data, int rows, int cols, DATA_
  * @return a non-templated OGScalar object.
  */
 template<typename T>
-OGTerminal * makeConcreteScalar(T data);
+pOGNumeric makeConcreteScalar(T data);
 // PTS
 template<>
-OGTerminal * makeConcreteScalar(real16 data);
+pOGNumeric  makeConcreteScalar(real16 data);
 template<>
-OGTerminal * makeConcreteScalar(complex16 data);
+pOGNumeric  makeConcreteScalar(complex16 data);
 
 
 } // end namespace librdag

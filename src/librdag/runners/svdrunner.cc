@@ -61,7 +61,7 @@ template<typename T> void svd_dense_runner(RegContainer& reg, const OGMatrix<T>*
   delete[] A;
 
   reg.push_back(makeConcreteDenseMatrix(U, m, m, OWNER));
-  reg.push_back(new OGRealDiagonalMatrix(S, m, n, OWNER));
+  reg.push_back(pOGNumeric{new OGRealDiagonalMatrix(S, m, n, OWNER)});
   reg.push_back(makeConcreteDenseMatrix(VT, n, n, OWNER));
 }
 
@@ -69,9 +69,9 @@ void *
 SVDRunner::run(RegContainer& reg, OGRealScalar const *arg) const
 {
   // real space svd is just u=1, s=value, v=1
-  reg.push_back(new OGRealScalar(1.e0));
-  reg.push_back(new OGRealScalar(arg->getValue()));
-  reg.push_back(new OGRealScalar(1.e0));
+  reg.push_back(pOGNumeric{new OGRealScalar(1.e0)});
+  reg.push_back(pOGNumeric{new OGRealScalar(arg->getValue())});
+  reg.push_back(pOGNumeric{new OGRealScalar(1.e0)});
   return nullptr;
 }
 void *

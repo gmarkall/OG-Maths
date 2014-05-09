@@ -28,15 +28,15 @@ namespace librdag {
 void *
 PINVRunner::run(RegContainer& reg, OGRealScalar const * arg) const
 {
-  const OGRealScalar* ret;
+  pOGNumeric ret;
   real16 x = arg->getValue();
   if(x == 0.e0)
   {
-    ret = new OGRealScalar(0.e0);
+    ret = pOGNumeric{new OGRealScalar(0.e0)};
   }
   else
   {
-    ret = new OGRealScalar(1.e0/x);
+    ret = pOGNumeric{new OGRealScalar(1.e0/x)};
   }
   reg.push_back(ret);
   return nullptr;
@@ -58,7 +58,7 @@ template<typename T>
 void
 pinv_dense_runner(RegContainer& reg, OGMatrix<T> const * arg)
 {
-  const OGTerminal* ret = nullptr; // the returned item
+  pOGNumeric ret; // the returned item
 
   // Matrix in scalar context, i.e. a 1x1 matrix, pinv is simply value**-1
   if(arg->getRows()==1 && arg->getCols()==1)
@@ -137,7 +137,7 @@ pinv_dense_runner(RegContainer& reg, OGMatrix<T> const * arg)
     runtree(VTSUT);
 
     // get the return item
-    ret = VTSUT->getRegs()[0]->asOGTerminal()->createOwningCopy();
+    ret = VTSUT->getRegs()[0];
 
     // clean up
     delete VTSUT;

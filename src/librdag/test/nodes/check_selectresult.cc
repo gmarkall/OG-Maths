@@ -38,7 +38,7 @@ TEST(SELECTRESULTTests,CheckBehaviour)
   {
     d->dispatch(*it);
   }
-  const OGNumeric * answer = s0->getRegs()[0];
+  pOGNumeric answer = s0->getRegs()[0];
   EXPECT_TRUE((*one) ==~ (*(answer->asOGTerminal())));
 
   // Check selecting 1 (S)
