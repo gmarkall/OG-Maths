@@ -82,16 +82,16 @@ pinv_dense_runner(RegContainer& reg, OGMatrix<T> const * arg)
     const int n = arg->getCols();
     const int minmn = m > n ? n : m;
 
-    // svd the arg
-    SVD * svd = new SVD(arg->createOwningCopy());
+    // Perform SVD on a copy of the argument, since it will get destroyed
+    SVD * svd = new SVD(pOGNumeric{arg->createOwningCopy()});
 
     // run the tree
-    runtree(svd);
+    runtree(pOGNumeric{svd});
 
     // svd regs now hold [U,S,V**T]
-    const OGNumeric * numericU = svd->getRegs()[0]->asOGTerminal()->createOwningCopy();
-    const OGNumeric * numericS = svd->getRegs()[1]->asOGTerminal()->createOwningCopy();
-    const OGNumeric * numericVT = svd->getRegs()[2]->asOGTerminal()->createOwningCopy();
+    pOGNumeric numericU = svd->getRegs()[0];
+    pOGNumeric numericS = svd->getRegs()[1];
+    pOGNumeric numericVT = svd->getRegs()[2];
 
     // don't need the svd any more, we have the data.
     delete svd;
@@ -121,28 +121,23 @@ pinv_dense_runner(RegContainer& reg, OGMatrix<T> const * arg)
 
     // create a new transposed inverted diag matrix.
     // this matrix is just a viewer of S, numericS is the owner
-    OGRealDiagonalMatrix * invS = new OGRealDiagonalMatrix(S,n,m);
+    pOGNumeric invS = pOGNumeric{new OGRealDiagonalMatrix(S,n,m)};
 
     // need to transpose U
-    CTRANSPOSE * ctransposeU = new CTRANSPOSE(numericU);
+    pOGNumeric ctransposeU = pOGNumeric{new CTRANSPOSE(numericU)};
 
     // need to transpose VT
-    CTRANSPOSE * ctransposeVT = new CTRANSPOSE(numericVT);
+    pOGNumeric ctransposeVT = pOGNumeric{new CTRANSPOSE(numericVT)};
 
     // multiply back together as [(V**T)**T * inv(S) * U**T]
-    MTIMES * VTS = new MTIMES(ctransposeVT, invS);
-    MTIMES * VTSUT = new MTIMES(VTS, ctransposeU);
+    pOGNumeric VTS = pOGNumeric{new MTIMES(ctransposeVT, invS)};
+    pOGNumeric VTSUT = pOGNumeric{new MTIMES(VTS, ctransposeU)};
 
     // run the tree
     runtree(VTSUT);
 
     // get the return item
-    ret = VTSUT->getRegs()[0];
-
-    // clean up
-    delete VTSUT;
-    // This is floating about still as it's owning and invS was just a view
-    delete numericS;
+    ret = VTSUT->asOGExpr()->getRegs()[0];
   }
 
   // shove ret into register

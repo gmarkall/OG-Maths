@@ -292,7 +292,7 @@ OGScalar<T>::debug_print() const
 }
 
 template<typename T>
-OGNumeric *
+pOGNumeric
 OGScalar<T>::copy() const
 {
   throw rdag_error("Cannot copy() template OGScalar<T> class.");
@@ -324,10 +324,10 @@ OGRealScalar::toComplex16ArrayOfArrays() const
   return tmp;
 }
 
-OGNumeric*
+pOGNumeric
 OGRealScalar::copy() const
 {
-  return new OGRealScalar(this->getValue());
+  return pOGNumeric{new OGRealScalar(this->getValue())};
 }
 
 const OGRealScalar*
@@ -384,10 +384,10 @@ OGComplexScalar::toComplex16ArrayOfArrays() const
   return this->toArrayOfArrays();
 }
 
-OGNumeric*
+pOGNumeric
 OGComplexScalar::copy() const
 {
-  return new OGComplexScalar(this->getValue());
+  return pOGNumeric{new OGComplexScalar(this->getValue())};
 }
 
 const OGComplexScalar*
@@ -439,10 +439,10 @@ OGComplexScalar::createComplexOwningCopy() const
 
 OGIntegerScalar::OGIntegerScalar(int data): OGScalar<int>(data) {}
 
-OGNumeric*
+pOGNumeric
 OGIntegerScalar::copy() const
 {
-  return new OGIntegerScalar(this->getValue());
+  return pOGNumeric{new OGIntegerScalar(this->getValue())};
 }
 
 const OGIntegerScalar*
@@ -654,7 +654,7 @@ debug_print() const
 }
 
 template<typename T>
-OGNumeric *
+pOGNumeric
 OGArray<T>::
 copy() const
 {
@@ -753,10 +753,10 @@ OGMatrix<T>::toArrayOfArrays() const
 }
 
 template<typename T>
-OGNumeric*
+pOGNumeric
 OGMatrix<T>::copy() const
 {
-  return new OGMatrix<T>(this->getData(), this->getRows(), this->getCols());
+  return pOGNumeric{new OGMatrix<T>(this->getData(), this->getRows(), this->getCols())};
 }
 
 template<typename T>
@@ -860,10 +860,10 @@ template class OGMatrix<complex16>;
  * OGRealMatrix
  */
 
-OGNumeric*
+pOGNumeric
 OGRealMatrix::copy() const
 {
-  return new OGRealMatrix(this->getData(), this->getRows(), this->getCols());
+  return pOGNumeric{new OGRealMatrix(this->getData(), this->getRows(), this->getCols())};
 }
 
 const OGRealMatrix*
@@ -928,10 +928,10 @@ OGComplexMatrix::toComplex16ArrayOfArrays() const
   return this->toArrayOfArrays();
 }
 
-OGNumeric*
+pOGNumeric
 OGComplexMatrix::copy() const
 {
-  return new OGComplexMatrix(this->getData(), this->getRows(), this->getCols());
+  return pOGNumeric{new OGComplexMatrix(this->getData(), this->getRows(), this->getCols())};
 }
 
 const OGComplexMatrix*
@@ -1076,10 +1076,10 @@ OGRealDiagonalMatrix::toReal16ArrayOfArrays() const
   return this->toArrayOfArrays();
 }
 
-OGNumeric*
+pOGNumeric
 OGRealDiagonalMatrix::copy() const
 {
-  return new OGRealDiagonalMatrix(this->getData(), this->getRows(), this->getCols());
+  return pOGNumeric{new OGRealDiagonalMatrix(this->getData(), this->getRows(), this->getCols())};
 }
 
 const OGRealDiagonalMatrix*
@@ -1170,10 +1170,10 @@ OGComplexDiagonalMatrix::toComplex16ArrayOfArrays() const
   return this->toArrayOfArrays();
 }
 
-OGNumeric*
+pOGNumeric
 OGComplexDiagonalMatrix::copy() const
 {
-  return new OGComplexDiagonalMatrix(this->getData(), this->getRows(), this->getCols());
+  return pOGNumeric{new OGComplexDiagonalMatrix(this->getData(), this->getRows(), this->getCols())};
 }
 
 const OGComplexDiagonalMatrix*
@@ -1397,11 +1397,11 @@ OGRealSparseMatrix::toReal16ArrayOfArrays() const
   return this->toArrayOfArrays();
 }
 
-OGNumeric*
+pOGNumeric
 OGRealSparseMatrix::copy() const
 {
-  return new OGRealSparseMatrix(this->getColPtr(), this->getRowIdx(), this->getData(),
-                                this->getRows(), this->getCols());
+  return pOGNumeric{new OGRealSparseMatrix(this->getColPtr(), this->getRowIdx(), this->getData(),
+                                           this->getRows(), this->getCols())};
 }
 
 const OGRealSparseMatrix*
@@ -1484,11 +1484,11 @@ OGComplexSparseMatrix::toComplex16ArrayOfArrays() const
   return this->toArrayOfArrays();
 }
 
-OGNumeric*
+pOGNumeric
 OGComplexSparseMatrix::copy() const
 {
-  return new OGComplexSparseMatrix(this->getColPtr(), this->getRowIdx(), this->getData(),
-                                   this->getRows(), this->getCols());
+  return pOGNumeric{new OGComplexSparseMatrix(this->getColPtr(), this->getRowIdx(), this->getData(),
+                                              this->getRows(), this->getCols())};
 }
 
 const OGComplexSparseMatrix*

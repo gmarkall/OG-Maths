@@ -65,7 +65,7 @@ class Dispatcher
   public:
     Dispatcher();
     virtual ~Dispatcher();
-    void dispatch(OGNumeric const * thing) const;
+    void dispatch(pOGNumeric thing) const;
 
     // Specific terminal dispatches
 %(dispatcher_terminal_dispatches)s
@@ -249,7 +249,7 @@ Dispatcher::~Dispatcher(){
 
 dispatcher_dispatch_numeric = """\
 void
-Dispatcher::dispatch(OGNumeric const *thing) const
+Dispatcher::dispatch(pOGNumeric thing) const
 {
   DEBUG_PRINT("Dispatching...\\n");
   ExprType_t ID = thing->getType();
@@ -303,8 +303,8 @@ Dispatcher::dispatch(%(nodetype)s const SUPPRESS_UNUSED * thing) const
 dispatcher_binary_implementation = """\
   const ArgContainer& args = thing->getArgs();
   RegContainer& regs = thing->getRegs();
-  const OGNumeric * arg0 = args[0];
-  const OGNumeric * arg1 = args[1];
+  pOGNumeric arg0 = args[0];
+  pOGNumeric arg1 = args[1];
   const OGTerminal* arg0t = arg0->asOGTerminal();
   const OGTerminal* arg1t = arg1->asOGTerminal();
   if (arg0t == nullptr)
@@ -321,7 +321,7 @@ dispatcher_binary_implementation = """\
 dispatcher_unary_implementation = """\
   const ArgContainer& args = thing->getArgs();
   RegContainer& regs = thing->getRegs();
-  const OGNumeric *arg = args[0];
+  pOGNumeric arg = args[0];
   const OGTerminal *argt = arg->asOGTerminal();
   if (argt == nullptr)
   {
@@ -333,8 +333,8 @@ dispatcher_unary_implementation = """\
 dispatcher_select_implementation = """\
   const ArgContainer& args = thing->getArgs();
   RegContainer& regs = thing->getRegs();
-  const OGNumeric *arg0 = args[0];
-  const OGNumeric *arg1 = args[1];
+  pOGNumeric arg0 = args[0];
+  pOGNumeric arg1 = args[1];
   const RegContainer& arg0r = arg0->asOGExpr()->getRegs();
   const OGIntegerScalar* arg1i = arg1->asOGIntegerScalar();
   this->_%(nodetype)sRunner->eval(regs, arg0r, arg1i);

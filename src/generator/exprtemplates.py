@@ -29,7 +29,6 @@ expression_hh = """\
 #include "numeric.hh"
 #include "visitor.hh"
 #include "exceptions.hh"
-#include "containers.hh"
 
 using namespace std;
 
@@ -52,7 +51,7 @@ class %(classname)s: public %(parentclass)s
 {
   public:
 %(constructor)s
-    virtual OGNumeric* copy() const override;
+    virtual pOGNumeric copy() const override;
     virtual const %(classname)s* as%(classname)s() const override;
     virtual void debug_print() const override;
     virtual ExprType_t getType() const override;
@@ -60,10 +59,10 @@ class %(classname)s: public %(parentclass)s
 """
 
 unary_constructor = """\
-    %(classname)s(const OGNumeric* arg);"""
+    %(classname)s(pOGNumeric arg);"""
 
 binary_constructor = """\
-    %(classname)s(const OGNumeric* arg0, const OGNumeric* arg1);"""
+    %(classname)s(pOGNumeric arg0, pOGNumeric arg1);"""
 
 # Expressions cc
 
@@ -99,7 +98,7 @@ expr_methods = """\
 
 %(ctor_method)s
 
-OGNumeric*
+pOGNumeric
 %(classname)s::copy() const
 {
 %(copy_method)s
@@ -126,16 +125,16 @@ ExprType_t
 """
 
 unary_ctor_method = """\
-%(classname)s::%(classname)s(const OGNumeric* arg): OGUnaryExpr{arg} {}"""
+%(classname)s::%(classname)s(pOGNumeric arg): OGUnaryExpr{arg} {}"""
 
 binary_ctor_method = """\
-%(classname)s::%(classname)s(const OGNumeric* arg1, const OGNumeric* arg2): OGBinaryExpr{arg1, arg2} {}"""
+%(classname)s::%(classname)s(pOGNumeric arg1, pOGNumeric arg2): OGBinaryExpr{arg1, arg2} {}"""
 
 unary_copy_method = """\
-  return new %(classname)s(_args[0]->copy());"""
+  return pOGNumeric{new %(classname)s(_args[0]->copy())};"""
 
 binary_copy_method = """\
-  return new %(classname)s(_args[0]->copy(), _args[1]->copy());"""
+  return pOGNumeric{new %(classname)s(_args[0]->copy(), _args[1]->copy())};"""
 
 # Numeric header file
 
@@ -158,7 +157,12 @@ numeric_hh = """\
 namespace librdag {
 
 // fwd decl
+class OGNumeric;
+typedef std::shared_ptr<const OGNumeric> pOGNumeric;
+
 class OGTerminal;
+typedef std::shared_ptr<const OGTerminal> pOGTerminal;
+
 class OGRealScalar;
 class OGComplexScalar;
 class OGIntegerScalar;
@@ -195,7 +199,7 @@ class OGNumeric: private Uncopyable
     virtual ~OGNumeric();
     virtual void debug_print() const = 0;
     virtual void accept(Visitor &v) const = 0;
-    virtual OGNumeric* copy() const = 0;
+    virtual pOGNumeric copy() const = 0;
     virtual const OGExpr* asOGExpr() const;
     virtual const COPY* asCOPY() const;
     virtual const SELECTRESULT* asSELECTRESULT() const;
@@ -220,8 +224,6 @@ class OGNumeric: private Uncopyable
     virtual const OGComplexSparseMatrix* asOGComplexSparseMatrix() const;
     virtual ExprType_t getType() const;
 };
-
-typedef std::shared_ptr<const OGNumeric> pOGNumeric;
 
 }
 #endif // _NUMERIC_HH

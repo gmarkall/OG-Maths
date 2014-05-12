@@ -63,19 +63,16 @@ void OGExpr::debug_print() const
  * Things that extend OGExpr
  */
 
-OGUnaryExpr::OGUnaryExpr(const OGNumeric* arg): OGExpr{}
+OGUnaryExpr::OGUnaryExpr(pOGNumeric arg): OGExpr{}
 {
   if (arg == nullptr)
   {
     throw rdag_error("Null operand passed to unary expression");
   }
   _args.push_back(arg);
-  // We got all the way through building the OGUnaryExpr object, so it
-  // is now safe to own the arguments.
-  _args.set_ownership(true);
 }
 
-OGBinaryExpr::OGBinaryExpr(const OGNumeric* arg0, const OGNumeric* arg1): OGExpr{}
+OGBinaryExpr::OGBinaryExpr(pOGNumeric arg0, pOGNumeric arg1): OGExpr{}
 {
   if (arg0 == nullptr)
   {
@@ -87,9 +84,6 @@ OGBinaryExpr::OGBinaryExpr(const OGNumeric* arg0, const OGNumeric* arg1): OGExpr
   }
   _args.push_back(arg0);
   _args.push_back(arg1);
-  // We got all the way through building the OGBinaryExpr object, so it
-  // is now safe to own the arguments.
-  _args.set_ownership(true);
 }
 
 /**
@@ -100,12 +94,12 @@ OGBinaryExpr::OGBinaryExpr(const OGNumeric* arg0, const OGNumeric* arg1): OGExpr
  * COPY node
  */
 
-COPY::COPY(const OGNumeric* arg): OGUnaryExpr{arg} {}
+COPY::COPY(pOGNumeric arg): OGUnaryExpr{arg} {}
 
-OGNumeric*
+pOGNumeric
 COPY::copy() const
 {
-  return new COPY(_args[0]->copy());
+  return pOGNumeric{new COPY(_args[0]->copy())};
 }
 
 const COPY*
@@ -129,7 +123,7 @@ COPY::getType() const
 /**
  * SELECTRESULT node
  */
-SELECTRESULT::SELECTRESULT(const OGNumeric* arg0, const OGNumeric* arg1): OGExpr{}
+SELECTRESULT::SELECTRESULT(pOGNumeric arg0, pOGNumeric arg1): OGExpr{}
 {
   if (arg0 == nullptr)
   {
@@ -145,15 +139,12 @@ SELECTRESULT::SELECTRESULT(const OGNumeric* arg0, const OGNumeric* arg1): OGExpr
   }
   _args.push_back(arg0);
   _args.push_back(arg1);
-  // We got all the way through building the SELECTRESULT object, so it
-  // is now safe to own the arguments.
-  _args.set_ownership(true);
 }
 
-OGNumeric*
+pOGNumeric
 SELECTRESULT::copy() const
 {
-  return new SELECTRESULT(_args[0]->copy(), _args[1]->copy());
+  return pOGNumeric{new SELECTRESULT(_args[0]->copy(), _args[1]->copy())};
 }
 
 const SELECTRESULT*
@@ -179,13 +170,13 @@ SELECTRESULT::getType() const
  * NORM2 node
  */
 
-NORM2::NORM2(const OGNumeric* arg): OGUnaryExpr{arg} {}
+NORM2::NORM2(pOGNumeric arg): OGUnaryExpr{arg} {}
 
-OGNumeric*
+pOGNumeric
 NORM2::copy() const
 {
 
-  return new NORM2(_args[0]->copy());
+  return pOGNumeric{new NORM2(_args[0]->copy())};
 }
 
 const NORM2*
@@ -210,13 +201,13 @@ NORM2::getType() const
  * PINV node
  */
 
-PINV::PINV(const OGNumeric* arg): OGUnaryExpr{arg} {}
+PINV::PINV(pOGNumeric arg): OGUnaryExpr{arg} {}
 
-OGNumeric*
+pOGNumeric
 PINV::copy() const
 {
 
-  return new PINV(_args[0]->copy());
+  return pOGNumeric{new PINV(_args[0]->copy())};
 }
 
 const PINV*
@@ -242,13 +233,13 @@ PINV::getType() const
  * TRANSPOSE node
  */
 
-TRANSPOSE::TRANSPOSE(const OGNumeric* arg): OGUnaryExpr{arg} {}
+TRANSPOSE::TRANSPOSE(pOGNumeric arg): OGUnaryExpr{arg} {}
 
-OGNumeric*
+pOGNumeric
 TRANSPOSE::copy() const
 {
 
-  return new TRANSPOSE(_args[0]->copy());
+  return pOGNumeric{new TRANSPOSE(_args[0]->copy())};
 }
 
 const TRANSPOSE*
@@ -274,13 +265,13 @@ TRANSPOSE::getType() const
  * CTRANSPOSE node
  */
 
-CTRANSPOSE::CTRANSPOSE(const OGNumeric* arg): OGUnaryExpr{arg} {}
+CTRANSPOSE::CTRANSPOSE(pOGNumeric arg): OGUnaryExpr{arg} {}
 
-OGNumeric*
+pOGNumeric
 CTRANSPOSE::copy() const
 {
 
-  return new CTRANSPOSE(_args[0]->copy());
+  return pOGNumeric{new CTRANSPOSE(_args[0]->copy())};
 }
 
 const CTRANSPOSE*
@@ -305,12 +296,12 @@ CTRANSPOSE::getType() const
  * SVD node
  */
 
-SVD::SVD(const OGNumeric* arg): OGUnaryExpr{arg} {}
+SVD::SVD(pOGNumeric arg): OGUnaryExpr{arg} {}
 
-OGNumeric*
+pOGNumeric
 SVD::copy() const
 {
-  return new SVD(_args[0]->copy());
+  return pOGNumeric{new SVD(_args[0]->copy())};
 }
 
 const SVD*
@@ -335,12 +326,12 @@ SVD::getType() const
  * LU node
  */
 
-LU::LU(const OGNumeric* arg): OGUnaryExpr{arg} {}
+LU::LU(pOGNumeric arg): OGUnaryExpr{arg} {}
 
-OGNumeric*
+pOGNumeric
 LU::copy() const
 {
-  return new LU(_args[0]->copy());
+  return pOGNumeric{new LU(_args[0]->copy())};
 }
 
 const LU*
@@ -366,12 +357,12 @@ LU::getType() const
  * MTIMES node
  */
 
-MTIMES::MTIMES(const OGNumeric* arg0, const OGNumeric* arg1): OGBinaryExpr{arg0, arg1} {}
+MTIMES::MTIMES(pOGNumeric arg0, pOGNumeric arg1): OGBinaryExpr{arg0, arg1} {}
 
-OGNumeric*
+pOGNumeric
 MTIMES::copy() const
 {
-  return new MTIMES(_args[0]->copy(), _args[1]->copy());
+  return pOGNumeric{new MTIMES(_args[0]->copy(), _args[1]->copy())};
 }
 
 const MTIMES*
